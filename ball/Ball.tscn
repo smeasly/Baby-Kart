@@ -1,0 +1,48 @@
+[gd_scene load_steps=9 format=2]
+
+[ext_resource path="res://ball/ball.png" type="Texture" id=1]
+[ext_resource path="res://ball/BallSprite.gd" type="Script" id=2]
+[ext_resource path="res://ball/BallTrailLine2D.gd" type="Script" id=3]
+[ext_resource path="res://ball/Ball.gd" type="Script" id=4]
+
+[sub_resource type="PhysicsMaterial" id=6]
+resource_local_to_scene = true
+bounce = 0.3
+
+[sub_resource type="CircleShape2D" id=9]
+resource_local_to_scene = true
+radius = 25.0
+
+[sub_resource type="Curve" id=8]
+_data = [ Vector2( 0, 0 ), 0.0, 0.0867768, 0, 0, Vector2( 1, 1 ), 1.13514, 0.0, 0, 0 ]
+
+[sub_resource type="Gradient" id=7]
+offsets = PoolRealArray( 0, 0.592179 )
+colors = PoolColorArray( 0, 0.054902, 0.0588235, 0, 0, 0.597656, 0.541626, 1 )
+
+[node name="Ball" type="RigidBody2D"]
+position = Vector2( 303, 278 )
+z_index = -1
+physics_material_override = SubResource( 6 )
+gravity_scale = 0.0
+script = ExtResource( 4 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource( 9 )
+
+[node name="Sprite" type="Sprite" parent="."]
+texture = ExtResource( 1 )
+script = ExtResource( 2 )
+
+[node name="Line2D" type="Line2D" parent="."]
+show_behind_parent = true
+z_index = -1
+width = 45.0
+width_curve = SubResource( 8 )
+default_color = Color( 0, 0.705882, 0.658824, 1 )
+gradient = SubResource( 7 )
+script = ExtResource( 3 )
+
+[node name="VisibilityNotifier2D" type="VisibilityNotifier2D" parent="."]
+
+[connection signal="screen_exited" from="VisibilityNotifier2D" to="." method="_on_VisibilityNotifier2D_screen_exited"]

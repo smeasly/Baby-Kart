@@ -1,0 +1,35 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://net/NetDetection.gd" type="Script" id=1]
+[ext_resource path="res://net/net.png" type="Texture" id=2]
+
+[sub_resource type="RectangleShape2D" id=5]
+extents = Vector2( 32.5, 171 )
+
+[sub_resource type="RectangleShape2D" id=6]
+extents = Vector2( 46, 3 )
+
+[node name="Net" type="StaticBody2D"]
+position = Vector2( 1, 0 )
+
+[node name="NetDetectArea2D" type="Area2D" parent="."]
+position = Vector2( 988, 283 )
+script = ExtResource( 1 )
+
+[node name="NetDetection" type="CollisionShape2D" parent="NetDetectArea2D"]
+position = Vector2( 1, 0 )
+shape = SubResource( 5 )
+
+[node name="Sprite" type="Sprite" parent="."]
+position = Vector2( 973, 283 )
+texture = ExtResource( 2 )
+
+[node name="NetCollisionTop" type="CollisionShape2D" parent="."]
+position = Vector2( 973, 109 )
+shape = SubResource( 6 )
+
+[node name="NetCollisionBottom" type="CollisionShape2D" parent="."]
+position = Vector2( 973, 457 )
+shape = SubResource( 6 )
+
+[connection signal="body_entered" from="NetDetectArea2D" to="NetDetectArea2D" method="_on_NetDetectArea2D_body_entered"]

@@ -1,9 +1,11 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://ball/ball.png" type="Texture" id=1]
 [ext_resource path="res://ball/BallSprite.gd" type="Script" id=2]
 [ext_resource path="res://ball/BallTrailLine2D.gd" type="Script" id=3]
 [ext_resource path="res://ball/Ball.gd" type="Script" id=4]
+[ext_resource path="res://SpawnParticle.tscn" type="PackedScene" id=5]
+[ext_resource path="res://DespawnParticle.tscn" type="PackedScene" id=6]
 
 [sub_resource type="PhysicsMaterial" id=6]
 resource_local_to_scene = true
@@ -26,6 +28,8 @@ z_index = -1
 physics_material_override = SubResource( 6 )
 gravity_scale = 0.0
 script = ExtResource( 4 )
+spawnParticle = ExtResource( 5 )
+despawnParticle = ExtResource( 6 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource( 9 )

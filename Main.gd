@@ -6,8 +6,10 @@ extends Node
 class_name Main
 
 
-var Ball = preload("res://ball/Ball.tscn")
-var Pickup = preload("res://pickup/HourglassPickup.tscn")
+var ball = preload("res://ball/Ball.tscn")
+var pickup = preload("res://pickup/HourglassPickup.tscn")
+#export var pickup : PackedScene
+#export var Ball : PackedScene
 
 signal new_high_score
 signal get_new_position
@@ -15,14 +17,14 @@ signal game_over
 signal reset
 signal update_score
 
-var score: int = 0
-var highScore: int
-#var queueBall: bool = false
-var queuePickup: bool
-var pickupSpawnIncr: int = 0
+var score : int = 0
+var highScore : int
+#var queueBall : bool = false
+var queuePickup : bool
+var pickupSpawnIncr : int = 0
 
-var newPos: Vector2
-var nextPos: Vector2
+var newPos  : Vector2
+var nextPos : Vector2
 
 #export var gameState: int = GameState.null
 
@@ -58,11 +60,10 @@ func _on_Play_pressed():
 
 
 func _on_NetDetectArea2D_score():
-	#TODO play particles
 	
 	pickupSpawnIncr += 1
-	
 	score += 5
+	
 	emit_signal("update_score", score)
 	
 	if score > highScore:
@@ -72,15 +73,14 @@ func _on_NetDetectArea2D_score():
 	
 	emit_signal("get_new_position")
 	
-	var new_ball = Ball.instance()
-	new_ball.position = newPos
-	print("main: newball position set by _on_SpawnCheck_newPosition")
-	call_deferred("add_child", new_ball) #??? not sure why this works and calling add_child(new_ball) doesn't
+	var _ball = ball.instance()
+	_ball.position = newPos
+	call_deferred("add_child", _ball) #??? not sure why this works and calling add_child(new_ball) doesn't
 	
 	if queuePickup == true && pickupSpawnIncr >= 2:
-		var new_pickup = Pickup.instance()
-		new_pickup.position = nextPos
-		call_deferred("add_child", new_pickup)
+		var _pickup = pickup.instance()
+		_pickup.position = nextPos
+		call_deferred("add_child", _pickup)
 		queuePickup = false
 		pickupSpawnIncr = 0
 
@@ -99,21 +99,19 @@ func _on_HourglassPickup_pickup():
 
 
 func _on_SpawnCheck_newPosition(safePosition):
-	#TODO play spawn particle
 	
 	newPos = safePosition
 	
 	#if queueBall == true:
-	#	var new_ball = Ball.instance()
-	#	new_ball.position = safePosition
-	#	print("main: newball position set by _on_SpawnCheck_newPosition")
-	#	call_deferred("add_child", new_ball) #??? not sure why this works and calling add_child(new_ball) doesn't
+	#	var _ball = ball.instance()
+	#	_ball.position = safePosition
+	#	call_deferred("add_child", _ball)
 	#	queueBall = false
 	
-	#if queuePickup == true && pickupSpawnIncr >= 2: #PLACEHOLDER - pickup mechanics will be changed.
-	#	var new_pickup = Pickup.instance()
-	#	new_pickup.position = safePosition
-	#	call_deferred("add_child", new_pickup)
+	#if queuePickup == true && pickupSpawnIncr >= 2:
+	#	var _pickup = pickup.instance()
+	#	_pickup.position = safePosition
+	#	call_deferred("add_child", _pickup)
 	#	queuePickup = false
 	#	pickupSpawnIncr = 0
 	#	#TODO: make pickup show after 2 goals scored only
@@ -131,7 +129,7 @@ func _on_TryAgain_pressed():
 	
 	score = 0
 	pickupSpawnIncr = 0
-	queuePickup = false
+	queuePickup = true
 	
 	emit_signal("update_score", score)
 	emit_signal("reset")

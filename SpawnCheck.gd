@@ -7,6 +7,9 @@ signal newPosition
 
 
 onready var PlayerCar = get_node("/root/Main/PlayerCar")
+onready var Ball = get_node("/root/Main/Ball")
+#export var ball : PackedScene
+#export var pickup : PackedScene
 
 var safePosition: Vector2
 var possiblePosition: Vector2
@@ -24,6 +27,13 @@ func get_possible_position():
 func get_safe_position(): 
 	
 	position = get_possible_position()
+	
+	#for body in SpawnCheck.get_overlapping_bodies():
+	#	if body.is_type(PhysicsBody2D):
+	#		get_possible_position
+	#	else:
+	#		safePosition = position
+	#		return safePosition
 	
 	if overlaps_body(PlayerCar):
 		get_possible_position()

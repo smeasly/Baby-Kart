@@ -3,30 +3,19 @@
 extends KinematicBody2D
 
 
-const MAX_SPEED:int = 500; const MAX_BACKSPEED:int = 250
-const ACCEL:int = 1000; const DECEL:int = 750
+const MAX_SPEED : int = 500; const MAX_BACKSPEED : int = 250
+const ACCEL : int = 1000; const DECEL : int = 750
 
-var direction: float
-var leftAccel: float; var rightAccel: float
-var angularAccel: float = 6
-var speed:float = 0; var backSpeed:float = 0 #not *actual* speed
+var direction : float
+var leftAccel : float; var rightAccel : float
+var angularAccel : float = 6
+var speed : float = 0; var backSpeed : float = 0 #not *actual* speed
 var velocity = Vector2.ZERO
-
-var toggleControl:bool = false #flag for automove/manual control
 
 
 func _ready():
+	
 	rotation_degrees = 90
-
-
-#func auto(delta):
-#	#Automatic movement, spinning in circles
-#	speed = clamp(speed, 0, MAX_SPEED)
-#	rotation += rightAccel * delta
-#	rightAccel = 6
-#	speed += ACCEL * delta
-#	velocity = Vector2.UP.rotated(rotation) * speed
-#	position += velocity * delta
 
 
 func manual_input(delta):
@@ -98,50 +87,42 @@ func manual_input(delta):
 
 func _physics_process(delta):
 	
-#	if toggleControl == true:
-#		auto(delta)
+	manual_input(delta)
+	rotation += direction
+	velocity = move_and_slide(velocity, Vector2(), false, 4, PI/4, true)
+	#this last bool-var controls whether or not this object has infinite inertia. The "correct" way to do this
+	#would to have this var set to false and 
 	
-	if toggleControl == false: 
-		manual_input(delta)
-		rotation += direction
-		velocity = move_and_slide(velocity, Vector2(), false, 4, PI/4, true)
-		#this last bool-var controls whether or not this object has infinite inertia. The "correct" way to do this
-		#would to have this var set to false and 
+	for index in get_slide_count(): #maybe use physics2ddirectspacestate collide_shape() here?
 		
-		for index in get_slide_count(): #maybe use physics2ddirectspacestate collide_shape() here?
-			
-			var collision = get_slide_collision(index)
-			#var last = get_last_slide_collision()
-			
-			if collision.collider.is_class("StaticBody2D"):
-				speed -= ACCEL * delta
-			
-			#this following part of the block is my attempt at fixing the 'stop on collide' issue
-			#it didn't work and is therefore commented out, but i may be able to get it to work later
-			# this implementation required putting ' export(float, 0, 1) var pushFactor ' at the head of the script
-		#	if collision.collider.is_class("RigidBody2D"): 
-				
-		#		clamp(pushFactor, 0, 1)
-		#		
-		#		if speed > 0:
-		#			pushFactor = speed / MAX_SPEED
-		#		elif backSpeed > 0:
-		#			pushFactor = backSpeed / MAX_BACKSPEED
-		#		
-		#		collision.collider.apply_central_impulse(-collision.normal * velocity.length() * pushFactor)
+		var collision = get_slide_collision(index)
+		#var last = get_last_slide_collision()
+		
+		if collision.collider.is_class("StaticBody2D"):
+			speed -= ACCEL * delta
+		
+		#this following part of the block is my attempt at fixing the 'stop on collide' issue, caused when property
+		#infinite inertia is turned off. it didn't work and is therefore commented out, but i may be able to get it to work later
+		#this implementation required putting ' export(float, 0, 1) var pushFactor ' at the head of the script
+		
+	#	if collision.collider.is_class("RigidBody2D"): 
+	#		clamp(pushFactor, 0, 1)
+	#		
+	#		if speed > 0:
+	#			pushFactor = speed / MAX_SPEED
+	#		elif backSpeed > 0:
+	#			pushFactor = backSpeed / MAX_BACKSPEED
+	#		
+	#		collision.collider.apply_central_impulse(-collision.normal * velocity.length() * pushFactor)
 
 
-#func _on_ToggleControl_toggled(button_pressed):
-#	toggleControl = button_pressed
-
-
-func _input(event):
-	if event is InputEventMouseButton:
-		if event.button_index == BUTTON_RIGHT and event.pressed:
-			#need to turn off trails temporarily here
-			position = get_viewport().get_mouse_position()
-			#not sure how to implement 'dropping' effect here. maybe create separate function for tweening car to new location
-			#and then do some resizing process in this block. might need _process() tho
+#func _input(event):
+#	if event is InputEventMouseButton:
+#		if event.button_index == BUTTON_RIGHT and event.pressed:
+#			#need to turn off trails temporarily here
+#			position = get_viewport().get_mouse_position()
+#			#not sure how to implement 'dropping' effect here. maybe create separate function for tweening car to new location
+#			#and then do some resizing process in this block. might need _process()?
 #			if $Sprite.scale(Vector2(3, 3)):
 #			$Sprite.scale(1, 1) * delta
 #			resize($Car.png)

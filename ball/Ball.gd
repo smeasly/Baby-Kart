@@ -1,6 +1,10 @@
 extends RigidBody2D 
 
 
+export var spawnParticle : PackedScene
+export var despawnParticle : PackedScene
+
+var _particle : Object
 var queueReset: bool = false
 var screenSize: Vector2 = Vector2()
 var randomPos: Vector2 = Vector2()
@@ -14,6 +18,9 @@ func _ready():
 	
 	NetDetectArea2D.connect("score",self,"_on_NetDetectArea2D_score") 
 	Main.connect("reset",self,"_on_Main_reset")
+	
+	_particle = spawnParticle.instance()
+	play_particle()
 
 
 func set_random_position():
@@ -24,13 +31,25 @@ func set_random_position():
 
 
 func _integrate_forces(state: Physics2DDirectBodyState) -> void:
+	
 	if queueReset:
 		
 		state.linear_velocity = Vector2.ZERO
 		state.angular_velocity = 0
 		
+		_particle = despawnParticle.instance()
+		play_particle()
+		
 		queueReset = false
 		return
+
+
+func play_particle():
+	_particle.position = global_position
+	_particle.rotation = global_rotation
+	_particle.emitting = true
+	#_particle.color = color(0,1,1,1)
+	get_tree().current_scene.call_deferred("add_child", _particle)
 
 
 func _on_VisibilityNotifier2D_screen_exited(): # this is a work around/failsafe for the ball tunneling through the wall
@@ -39,7 +58,10 @@ func _on_VisibilityNotifier2D_screen_exited(): # this is a work around/failsafe 
 
 
 func _on_NetDetectArea2D_score():
-	#TODO play particles
+	
+	_particle = despawnParticle.instance()
+	play_particle()
+	
 	queue_free()
 
 

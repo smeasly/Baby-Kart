@@ -1,10 +1,8 @@
 extends Timer
 
-#start paused
-#set start time to 30sec
-#emit signal on timeout
 
 signal timer_time_remaining
+
 
 func _ready():
 	start(60)

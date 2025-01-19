@@ -131,7 +131,7 @@ func _on_TryAgain_pressed():
 	
 	score = 0
 	pickupSpawnIncr = 0
-	queuePickup = false
+	queuePickup = true
 	
 	emit_signal("update_score", score)
 	emit_signal("reset")

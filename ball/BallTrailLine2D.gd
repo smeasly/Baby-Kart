@@ -10,12 +10,3 @@ func _process(_delta):
 	add_point(point)
 	while get_point_count() > length:
 		remove_point(0)
-
-
-#func _on_ToggleProcButton_pressed():
-#	#!processingFlag
-#	set_process(!is_processing())
-
-
-#func _on_ToggleTrails_pressed():
-#	set_visible(!is_visible())

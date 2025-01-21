@@ -1,18 +1,36 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
+[ext_resource path="res://assets/smoke_particle.png" type="Texture" id=1]
 [ext_resource path="res://player/Player.gd" type="Script" id=2]
 [ext_resource path="res://player/car3.png" type="Texture" id=3]
-[ext_resource path="res://player/SmokeTrailLine2D.gd" type="Script" id=5]
 
 [sub_resource type="RectangleShape2D" id=4]
 extents = Vector2( 18, 44 )
 
-[sub_resource type="Curve" id=2]
-_data = [ Vector2( 0, 0.181818 ), 0.0, 0.291667, 0, 0, Vector2( 1, 1 ), 2.11005, 0.0, 0, 0 ]
+[sub_resource type="Gradient" id=5]
+offsets = PoolRealArray( 0.5, 1 )
+colors = PoolColorArray( 1, 1, 1, 0.666667, 1, 1, 1, 0 )
 
-[sub_resource type="Gradient" id=3]
-offsets = PoolRealArray( 0, 0.553073 )
-colors = PoolColorArray( 0.0901961, 0.0901961, 0.0901961, 0, 0.695313, 0, 0, 1 )
+[sub_resource type="GradientTexture" id=6]
+gradient = SubResource( 5 )
+
+[sub_resource type="ParticlesMaterial" id=7]
+lifetime_randomness = 0.5
+emission_shape = 1
+emission_sphere_radius = 5.0
+flag_disable_z = true
+direction = Vector3( 0, 1, 0 )
+spread = 20.0
+gravity = Vector3( 0, 0, 0 )
+initial_velocity = 50.0
+initial_velocity_random = 0.5
+angular_velocity = 20.0
+angular_velocity_random = 0.5
+orbit_velocity = 0.0
+orbit_velocity_random = 0.0
+scale = 0.1
+scale_random = 0.5
+color_ramp = SubResource( 6 )
 
 [node name="PlayerCar" type="KinematicBody2D"]
 position = Vector2( 521, 272 )
@@ -25,10 +43,12 @@ shape = SubResource( 4 )
 [node name="Sprite" type="Sprite" parent="."]
 texture = ExtResource( 3 )
 
-[node name="TrailLine2D" type="Line2D" parent="."]
+[node name="ParticleTrail" type="Particles2D" parent="."]
 show_behind_parent = true
-width = 25.0
-width_curve = SubResource( 2 )
-default_color = Color( 0.564706, 0.109804, 0.109804, 1 )
-gradient = SubResource( 3 )
-script = ExtResource( 5 )
+position = Vector2( 0, 32 )
+amount = 55
+lifetime = 0.3
+randomness = 0.5
+local_coords = false
+process_material = SubResource( 7 )
+texture = ExtResource( 1 )

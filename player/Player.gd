@@ -1,5 +1,3 @@
-#Player car control script
-
 extends KinematicBody2D
 
 
@@ -56,24 +54,29 @@ func manual_input(delta):
 	if inputLeft: #and (speed > 0 or backSpeed > 0):
 		leftAccel += 0.7
 		direction -= leftAccel * delta
-	elif !inputLeft and leftAccel != 0:
+		
+	elif !inputLeft: #and leftAccel != 0:
 		leftAccel -= 0.35
 		direction -= leftAccel * delta
 	
 	if inputRight: #and (speed > 0 or backSpeed > 0):
 		rightAccel += 0.7
 		direction += rightAccel * delta
-	elif !inputRight and rightAccel != 0:
+		
+	elif !inputRight: #and rightAccel != 0:
 		rightAccel -= 0.35
 		direction += rightAccel * delta
 	
+	
 	#ACCELERATION AND DECELERATION
+	
 	speed = clamp(speed, 0, MAX_SPEED)
 	backSpeed = clamp(backSpeed, 0, MAX_BACKSPEED)
 	
 	if inputUp:
 		speed += ACCEL * delta
 		velocity += Vector2.UP.rotated(rotation) * speed
+		
 	elif !inputUp && speed > 0:
 		speed -= DECEL * delta
 		velocity += Vector2.UP.rotated(rotation) * speed
@@ -81,22 +84,26 @@ func manual_input(delta):
 	if inputDown:
 		backSpeed += ACCEL * delta
 		velocity += Vector2.DOWN.rotated(rotation) * backSpeed
+		
 	elif !inputDown && backSpeed > 0:
 		backSpeed -= DECEL * delta
 		velocity += Vector2.DOWN.rotated(rotation) * backSpeed
+
 
 func _physics_process(delta):
 	
 	manual_input(delta)
 	rotation += direction
-	velocity = move_and_slide(velocity, Vector2(), false, 4, PI/4, true)
-	#this last bool-var controls whether or not this object has infinite inertia. The "correct" way to do this
-	#would to have this var set to false and 
+	velocity = move_and_slide(velocity, Vector2(), false, 4, PI/4, true) #this last bool-var controls whether or not this object has infinite inertia.
+	
+	if speed > 125 || backSpeed > 200:
+		$ParticleTrail.emitting = true
+	elif speed < 125 || backSpeed < 200 && $ParticleTrail.is_emitting() == true:
+		$ParticleTrail.emitting = false
 	
 	for index in get_slide_count(): #maybe use physics2ddirectspacestate collide_shape() here?
 		
 		var collision = get_slide_collision(index)
-		#var last = get_last_slide_collision()
 		
 		if collision.collider.is_class("StaticBody2D"):
 			speed -= ACCEL * delta
@@ -129,10 +136,12 @@ func _physics_process(delta):
 
 
 func _on_Play_pressed():
+	
 	show()
 
 
 func _on_Main_reset():
+	
 	velocity = Vector2.ZERO
 	leftAccel = 0
 	rightAccel = 0

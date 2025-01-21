@@ -13,7 +13,7 @@ bounce = 0.3
 
 [sub_resource type="CircleShape2D" id=9]
 resource_local_to_scene = true
-radius = 25.0
+radius = 30.0167
 
 [sub_resource type="Curve" id=8]
 _data = [ Vector2( 0, 0 ), 0.0, 0.0867768, 0, 0, Vector2( 1, 1 ), 1.13514, 0.0, 0, 0 ]
@@ -25,6 +25,7 @@ colors = PoolColorArray( 0, 0.054902, 0.0588235, 0, 0, 0.597656, 0.541626, 1 )
 [node name="Ball" type="RigidBody2D"]
 position = Vector2( 303, 278 )
 z_index = -1
+mass = 0.816326
 physics_material_override = SubResource( 6 )
 gravity_scale = 0.0
 script = ExtResource( 4 )
@@ -35,18 +36,20 @@ despawnParticle = ExtResource( 6 )
 shape = SubResource( 9 )
 
 [node name="Sprite" type="Sprite" parent="."]
+scale = Vector2( 1.2, 1.2 )
 texture = ExtResource( 1 )
 script = ExtResource( 2 )
 
 [node name="Line2D" type="Line2D" parent="."]
 show_behind_parent = true
 z_index = -1
-width = 45.0
+width = 55.0
 width_curve = SubResource( 8 )
 default_color = Color( 0, 0.705882, 0.658824, 1 )
 gradient = SubResource( 7 )
 script = ExtResource( 3 )
 
 [node name="VisibilityNotifier2D" type="VisibilityNotifier2D" parent="."]
+position = Vector2( -0.499992, 0 )
 
 [connection signal="screen_exited" from="VisibilityNotifier2D" to="." method="_on_VisibilityNotifier2D_screen_exited"]

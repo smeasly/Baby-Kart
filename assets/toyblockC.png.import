@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/ball.png-fe5cf1f159ed2817484efdf4cb8bda2a.stex"
+path="res://.import/toyblockC.png-7343fba3ae6f0c9b0fc4a625a27fe508.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ball/ball.png"
-dest_files=[ "res://.import/ball.png-fe5cf1f159ed2817484efdf4cb8bda2a.stex" ]
+source_file="res://assets/toyblockC.png"
+dest_files=[ "res://.import/toyblockC.png-7343fba3ae6f0c9b0fc4a625a27fe508.stex" ]
 
 [params]
 
@@ -20,7 +20,7 @@ compress/hdr_mode=0
 compress/bptc_ldr=0
 compress/normal_map=0
 flags/repeat=0
-flags/filter=true
+flags/filter=false
 flags/mipmaps=false
 flags/anisotropic=false
 flags/srgb=2

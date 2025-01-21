@@ -9,6 +9,7 @@
 radius = 28.0179
 
 [node name="HourglassPickup" type="Area2D"]
+z_index = -1
 script = ExtResource( 2 )
 spawnParticle = ExtResource( 3 )
 despawnParticle = ExtResource( 4 )

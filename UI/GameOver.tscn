@@ -28,6 +28,7 @@ margin_right = 482.0
 margin_bottom = 167.0
 theme = ExtResource( 3 )
 text = "Your Score: %s score"
+align = 1
 script = ExtResource( 1 )
 
 [node name="TryAgain" type="Button" parent="VBoxContainer"]

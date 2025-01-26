@@ -23,6 +23,7 @@ var pickupSpawnIncr : int = 0
 var newPos  : Vector2
 var nextPos : Vector2
 
+var firstStart: bool = true
 
 func _ready():
 	
@@ -30,14 +31,27 @@ func _ready():
 
 
 func _on_Play_pressed():
-	
 	get_tree().paused = false
-	
-	queuePickup = true
-	emit_signal("get_new_position")
-	nextPos = newPos  #kind of hacky. save a position on pickup, use this pos for next pickups spawn to avoid overlapping with ball spawn
-	
-	spawn_ball()
+	$OpenMenu.show()
+	if firstStart == true:
+		queuePickup = true
+		emit_signal("get_new_position")
+		nextPos = newPos  #kind of hacky. save a position on pickup, use this pos for next pickups spawn to avoid overlapping with ball spawn
+		
+		spawn_ball()
+		
+		$PlayerCar.show()
+		$Timer/TimerDisplay.show()
+		$ScoreDisplay.show()
+		$Environment/ToyBlocks.show()
+		$Net.show()
+		firstStart = false
+
+
+func _on_OpenMenu_pressed():
+	get_tree().paused = true
+	$OpenMenu.hide()
+	$MainMenu.show()
 
 
 #func _input(event : InputEvent):
@@ -127,11 +141,9 @@ func close_game():
 	
 	get_tree().quit()
 
-
 func _on_Quit_pressed():
 	
 	close_game()
-
 
 func _on_Exit_pressed():
 	

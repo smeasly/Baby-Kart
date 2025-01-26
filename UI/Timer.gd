@@ -1,9 +1,6 @@
 extends Timer
 
 
-signal timer_time_remaining
-
-
 func _ready():
 	
 	start(60)
@@ -11,10 +8,10 @@ func _ready():
 
 func _physics_process(_delta):
 	
-	emit_signal("timer_time_remaining",  stepify(time_left, 00.1))
+	$TimerDisplay.text = "Time: %s" % stepify(time_left, 00.1)
 	
-#	if is_stopped():
-#		set_process(!is_processing())
+	if time_left <= 0.1:
+		$TimerDisplay.text = "Time's Up!"
 
 
 func _on_HourglassPickup_pickup():
@@ -27,3 +24,4 @@ func _on_HourglassPickup_pickup():
 
 func _on_Main_reset():
 	start(60)
+	$TimerDisplay.text = "Time: %s" % time_left

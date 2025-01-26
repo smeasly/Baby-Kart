@@ -12,6 +12,5 @@ The object of the game is to push the ball into the net before the time limit ru
 
 ### Planned/Currently Unimplemented Features
 - Audio system
-- Expanded menus
 - Writing high-score to file
 - Controller support

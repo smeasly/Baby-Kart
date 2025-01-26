@@ -6,28 +6,71 @@ const ACCEL : int = 1000; const DECEL : int = 750
 
 var direction : float
 var leftAccel : float; var rightAccel : float
-var angularAccel : float = 6
 var speed : float = 0; var backSpeed : float = 0 #not *actual* speed
 var velocity = Vector2.ZERO
 
+var maxAngularAccel : float = 6
+
+var green_car = preload("res://player/car.png")
+var blue_car = preload("res://player/car2.png")
+var red_car = preload("res://player/car3.png")
+
+var carTypes = [green_car, blue_car, red_car]
+
+var currentType = 0
+
 
 func _ready():
-	
 	rotation_degrees = 90
+
+
+func _on_MainMenu_change_player_sprite(value):
+	$Sprite.texture = carTypes[value]
+	currentType = value
+
+func set_stats_from_carttype():
+	
+	match currentType:
+		0: #green_car
+			maxAngularAccel = 6
+			#AngularAccelCoef = 0.7
+			#AngularDecelCoef = 0.35
+			#MAX_SPEED = 500
+			#MAX_BACKSPEED = 250
+			#ACCEL = 1000
+			#DECEL = 750
+			return 0
+		
+		1: #blue_car
+			maxAngularAccel = 6
+			#AngularAccelCoef = 0.7
+			#AngularDecelCoef = 0.35
+			#MAX_SPEED = 500
+			#MAX_BACKSPEED = 250
+			#ACCEL = 1000
+			#DECEL = 750
+			return 1
+		
+		2: #red_car
+			maxAngularAccel = 6
+			#AngularAccelCoef = 0.7
+			#AngularDecelCoef = 0.35
+			#MAX_SPEED = 500
+			#MAX_BACKSPEED = 250
+			#ACCEL = 1000
+			#DECEL = 750
+			return 2
 
 
 func manual_input(delta):
 	
-	var inputUp = Input.is_action_pressed("ui_up") #i can do this in input mapping in project settings, but this is fine for now
+	var inputUp = Input.is_action_pressed("ui_up")
 	var inputDown = Input.is_action_pressed("ui_down")
 	var inputLeft = Input.is_action_pressed("ui_left")
 	var inputRight = Input.is_action_pressed("ui_right")
 	
 	velocity = Vector2.ZERO
 	direction = 0
-	leftAccel = clamp(leftAccel, 0, 4.5) #do we need to clamp this every frame? probably not. move this to head declare block
-	rightAccel = clamp(rightAccel, 0, 4.5)
-	
 	
 	#STEERING
 	
@@ -44,14 +87,15 @@ func manual_input(delta):
 	#Use clamp() on the result of range_lerp() if this is not desired.
 	#range_lerp(75, 0, 100, -1, 1) # Returns 0.5
 	
-	
 	#leftAccelAdd = range_lerp(speed, 1, MAX_SPEED, 0.8, 0.2)	something like this?; as speed approaches max, 
 	#leftAccelAdd = clamp(leftAccelAdd, 0.2, 0.8)				turnAccelAdd approaches min.
 	#if inputLeft:
 	#	leftAccel += leftAccelAdd
 	
+	leftAccel = clamp(leftAccel, 0, 6)
+	rightAccel = clamp(rightAccel, 0, 6)
 	
-	if inputLeft: #and (speed > 0 or backSpeed > 0):
+	if inputLeft: #&& (speed > 100 || backSpeed > 100):
 		leftAccel += 0.7
 		direction -= leftAccel * delta
 		
@@ -59,7 +103,7 @@ func manual_input(delta):
 		leftAccel -= 0.35
 		direction -= leftAccel * delta
 	
-	if inputRight: #and (speed > 0 or backSpeed > 0):
+	if inputRight: #&& (speed > 100 || backSpeed > 100):
 		rightAccel += 0.7
 		direction += rightAccel * delta
 		
@@ -67,6 +111,13 @@ func manual_input(delta):
 		rightAccel -= 0.35
 		direction += rightAccel * delta
 	
+	#if inputLeft && (!inputDown || !inputUp):
+	#	leftAccel -= 0.35
+	#	direction -= leftAccel * delta
+	
+	#if inputRight && (!inputDown || !inputUp)
+	#	rightAccel -= 0.35
+	#	direction += rightAccel * delta
 	
 	#ACCELERATION AND DECELERATION
 	
@@ -96,9 +147,9 @@ func _physics_process(delta):
 	rotation += direction
 	velocity = move_and_slide(velocity, Vector2(), false, 4, PI/4, true) #this last bool-var controls whether or not this object has infinite inertia.
 	
-	if speed > 125 || backSpeed > 200:
+	if speed > 125: #|| backSpeed > 200:
 		$ParticleTrail.emitting = true
-	elif speed < 125 || backSpeed < 200 && $ParticleTrail.is_emitting() == true:
+	elif speed < 125 && $ParticleTrail.is_emitting() == true:
 		$ParticleTrail.emitting = false
 	
 	for index in get_slide_count(): #maybe use physics2ddirectspacestate collide_shape() here?
@@ -106,10 +157,10 @@ func _physics_process(delta):
 		var collision = get_slide_collision(index)
 		
 		if collision.collider.is_class("StaticBody2D"):
-			speed -= ACCEL * delta
+			speed -= (ACCEL * 2) * delta
 		
 		#this following part of the block is my attempt at fixing the 'stop on collide' issue, caused when property
-		#infinite inertia is turned off. it didn't work and is therefore commented out, but i may be able to get it to work later
+		#infinite_inertia = false. it didn't work and is therefore commented out, but i may be able to get it to work later
 		#this implementation required putting ' export(float, 0, 1) var pushFactor ' at the head of the script
 		
 	#	if collision.collider.is_class("RigidBody2D"): 
@@ -133,11 +184,6 @@ func _physics_process(delta):
 #			if $Sprite.scale(Vector2(3, 3)):
 #			$Sprite.scale(1, 1) * delta
 #			resize($Car.png)
-
-
-func _on_Play_pressed():
-	
-	show()
 
 
 func _on_Main_reset():

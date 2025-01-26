@@ -2,14 +2,13 @@
 
 [ext_resource path="res://assets/smoke_particle.png" type="Texture" id=1]
 [ext_resource path="res://player/Player.gd" type="Script" id=2]
-[ext_resource path="res://player/car3.png" type="Texture" id=3]
+[ext_resource path="res://player/car.png" type="Texture" id=3]
 
 [sub_resource type="RectangleShape2D" id=4]
 extents = Vector2( 18, 44 )
 
 [sub_resource type="Gradient" id=5]
-offsets = PoolRealArray( 0.5, 1 )
-colors = PoolColorArray( 1, 1, 1, 0.666667, 1, 1, 1, 0 )
+colors = PoolColorArray( 1, 1, 1, 1, 1, 1, 1, 0 )
 
 [sub_resource type="GradientTexture" id=6]
 gradient = SubResource( 5 )
@@ -46,7 +45,7 @@ texture = ExtResource( 3 )
 [node name="ParticleTrail" type="Particles2D" parent="."]
 show_behind_parent = true
 position = Vector2( 0, 32 )
-amount = 55
+amount = 60
 lifetime = 0.3
 randomness = 0.5
 local_coords = false

@@ -1,6 +1,7 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Particle.gd" type="Script" id=1]
+[ext_resource path="res://assets/spark_particle2.png" type="Texture" id=2]
 
 [sub_resource type="Gradient" id=1]
 offsets = PoolRealArray( 0.464516, 1 )
@@ -22,9 +23,12 @@ spread = 180.0
 gravity = Vector3( 0, 0, 0 )
 initial_velocity = 300.0
 initial_velocity_random = 0.5
+angular_velocity = 150.0
+angular_velocity_random = 0.5
 orbit_velocity = 1.0
 orbit_velocity_random = 0.5
-scale = 20.0
+scale = 2.0
+scale_random = 0.5
 scale_curve = SubResource( 4 )
 color_ramp = SubResource( 2 )
 hue_variation_random = 0.5
@@ -37,4 +41,5 @@ one_shot = true
 explosiveness = 1.0
 local_coords = false
 process_material = SubResource( 5 )
+texture = ExtResource( 2 )
 script = ExtResource( 1 )

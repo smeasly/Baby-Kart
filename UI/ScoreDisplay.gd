@@ -7,5 +7,5 @@ func _ready():
 	text = "Score: 0"
 
 
-func _on_Main_update_score(score: int):
+func _on_Main_update_score(score: int) -> void:
 	text = "Score: %s" % score

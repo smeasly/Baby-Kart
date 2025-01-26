@@ -28,11 +28,13 @@ config/icon="res://assets/icon.png"
 
 [display]
 
+window/size/resizable=false
 window/stretch/aspect="keep"
 
 [gui]
 
 common/drop_mouse_on_gui_input_disabled=true
+timers/tooltip_delay_sec=0.2
 
 [physics]
 

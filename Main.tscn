@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=2]
+[gd_scene load_steps=27 format=2]
 
 [ext_resource path="res://player/PlayerCar.tscn" type="PackedScene" id=1]
 [ext_resource path="res://ball/Ball.tscn" type="PackedScene" id=2]
@@ -17,7 +17,6 @@
 [ext_resource path="res://pickup/HourglassPickup.tscn" type="PackedScene" id=15]
 [ext_resource path="res://UI/GameOver.gd" type="Script" id=16]
 [ext_resource path="res://UI/GameOver.tscn" type="PackedScene" id=17]
-[ext_resource path="res://UI/OpenMenu.gd" type="Script" id=18]
 [ext_resource path="res://assets/toyblockC.png" type="Texture" id=19]
 [ext_resource path="res://assets/toyblockA.png" type="Texture" id=20]
 
@@ -31,11 +30,27 @@ font_data = ExtResource( 14 )
 resource_name = "Baby Theme"
 default_font = SubResource( 6 )
 
+[sub_resource type="GDScript" id=14]
+script/source = "extends StaticBody2D
+
+
+func _on_Play_pressed():
+	show()
+"
+
 [sub_resource type="RectangleShape2D" id=12]
 extents = Vector2( 63.9932, 63.9932 )
 
 [sub_resource type="RectangleShape2D" id=13]
 extents = Vector2( 63.9932, 63.9932 )
+
+[sub_resource type="GDScript" id=15]
+script/source = "extends StaticBody2D
+
+
+func _on_Play_pressed():
+	show()
+"
 
 [sub_resource type="CircleShape2D" id=10]
 radius = 88.0057
@@ -47,13 +62,11 @@ ball = ExtResource( 2 )
 
 [node name="OpenMenu" type="Button" parent="."]
 pause_mode = 2
-visible = false
-margin_left = 973.0
-margin_top = 2.0
-margin_right = 1021.0
-margin_bottom = 22.0
+margin_left = 968.0
+margin_top = 8.0
+margin_right = 1016.0
+margin_bottom = 32.0
 text = "Menu"
-script = ExtResource( 18 )
 
 [node name="GameOver" parent="." instance=ExtResource( 17 )]
 pause_mode = 2
@@ -70,6 +83,7 @@ autostart = true
 script = ExtResource( 13 )
 
 [node name="TimerDisplay" type="Label" parent="Timer"]
+visible = false
 margin_left = 6.0
 margin_top = -1.0
 margin_right = 270.0
@@ -83,6 +97,7 @@ text = "Time:"
 script = ExtResource( 12 )
 
 [node name="ScoreDisplay" type="Label" parent="."]
+visible = false
 margin_left = 6.0
 margin_top = 56.0
 margin_right = 141.0
@@ -105,11 +120,13 @@ z_index = -2
 texture = ExtResource( 3 )
 
 [node name="ToyBlocks" type="StaticBody2D" parent="Environment"]
+visible = false
+z_index = -1
+script = SubResource( 14 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/ToyBlocks"]
 position = Vector2( 923, 43.5 )
 rotation = 0.785398
-scale = Vector2( 1, 1 )
 shape = SubResource( 12 )
 
 [node name="Sprite" type="Sprite" parent="Environment/ToyBlocks/CollisionShape2D"]
@@ -118,7 +135,6 @@ texture = ExtResource( 20 )
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="Environment/ToyBlocks"]
 position = Vector2( 923, 556.5 )
 rotation = 0.785398
-scale = Vector2( 1, 1 )
 shape = SubResource( 13 )
 
 [node name="Sprite" type="Sprite" parent="Environment/ToyBlocks/CollisionShape2D2"]
@@ -133,7 +149,9 @@ collision/safe_margin = 1.0
 moving_platform_apply_velocity_on_leave = 2
 
 [node name="Net" parent="." instance=ExtResource( 5 )]
+visible = false
 position = Vector2( 0, 0 )
+script = SubResource( 15 )
 
 [node name="Sprite" parent="Net" index="1"]
 z_index = 1
@@ -155,14 +173,14 @@ texture = ExtResource( 10 )
 [connection signal="reset" from="." to="PlayerCar" method="_on_Main_reset"]
 [connection signal="update_score" from="." to="GameOver/VBoxContainer/LabelFinalScore" method="_on_Main_update_score"]
 [connection signal="update_score" from="." to="ScoreDisplay" method="_on_Main_update_score"]
+[connection signal="pressed" from="OpenMenu" to="." method="_on_OpenMenu_pressed"]
 [connection signal="pressed" from="GameOver/VBoxContainer/TryAgain" to="." method="_on_TryAgain_pressed"]
 [connection signal="pressed" from="GameOver/VBoxContainer/TryAgain" to="GameOver" method="_on_TryAgain_pressed"]
 [connection signal="pressed" from="GameOver/VBoxContainer/Quit" to="." method="_on_Quit_pressed"]
+[connection signal="change_player_sprite" from="MainMenu" to="PlayerCar" method="_on_MainMenu_change_player_sprite"]
 [connection signal="pressed" from="MainMenu/Play" to="." method="_on_Play_pressed"]
-[connection signal="pressed" from="MainMenu/Play" to="PlayerCar" method="_on_Play_pressed"]
 [connection signal="pressed" from="MainMenu/Exit" to="." method="_on_Exit_pressed"]
 [connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]
-[connection signal="timer_time_remaining" from="Timer" to="Timer/TimerDisplay" method="_on_Timer_timer_time_remaining"]
 [connection signal="score" from="Net/NetDetectArea2D" to="." method="_on_NetDetectArea2D_score"]
 [connection signal="newPosition" from="SpawnCheck" to="." method="_on_SpawnCheck_newPosition"]
 

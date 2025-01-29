@@ -3,14 +3,17 @@ extends RigidBody2D
 
 export var spawnParticle : PackedScene
 export var despawnParticle : PackedScene
-
 var _particle : Object
+
 var queueReset: bool = false
 var screenSize: Vector2 = Vector2()
 var randomPos: Vector2 = Vector2()
+var spriteStartRotation : float
 
 
 func _ready(): #Connect score signal to each new instance of Ball on instance
+	
+	spriteStartRotation = global_rotation_degrees
 	
 	var NetDetectArea2D = get_node("/root/Main/Net/NetDetectArea2D")
 	var Main = get_node("/root/Main")
@@ -30,7 +33,7 @@ func set_random_position():
 	position = Vector2(randomPos.x, randomPos.y)
 
 
-func _integrate_forces(state: Physics2DDirectBodyState) -> void:
+func _integrate_forces(state: Physics2DDirectBodyState):
 	
 	if queueReset:
 		state.linear_velocity = Vector2.ZERO
@@ -43,6 +46,11 @@ func _integrate_forces(state: Physics2DDirectBodyState) -> void:
 		
 		queueReset = false
 		return
+
+
+func _process(_delta):
+	
+	$Sprite.set_global_rotation_degrees(spriteStartRotation)
 
 
 func play_particle():
@@ -75,5 +83,5 @@ func _on_Main_reset():
 	
 	$Line2D.hide()
 	
-	set_random_position()
-	queueReset = true
+	#set_random_position()
+	#queueReset = true

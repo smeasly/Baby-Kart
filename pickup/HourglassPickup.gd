@@ -8,6 +8,7 @@ export var despawnParticle : PackedScene
 
 var _particle : Object
 
+
 func _ready():
 	
 	#Connects reset and pickup(score and add time) signals on each new instance
@@ -34,8 +35,10 @@ func play_particle():
 func _on_HourglassPickup_body_entered(body):
 	if body.is_class("KinematicBody2D"):
 		emit_signal("pickup") 
+		
 		_particle = despawnParticle.instance()
 		play_particle()
+		
 		queue_free()
 
 

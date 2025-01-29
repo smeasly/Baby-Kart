@@ -140,7 +140,9 @@ margin_left = 17.0
 margin_top = 209.0
 margin_right = 241.0
 margin_bottom = 225.0
-value = 100.0
+max_value = 1.0
+step = 0.01
+value = 1.0
 tick_count = 25
 ticks_on_borders = true
 
@@ -158,7 +160,9 @@ margin_left = 17.0
 margin_top = 281.0
 margin_right = 241.0
 margin_bottom = 297.0
-value = 100.0
+max_value = 1.0
+step = 0.01
+value = 1.0
 tick_count = 25
 ticks_on_borders = true
 
@@ -168,3 +172,6 @@ ticks_on_borders = true
 [connection signal="pressed" from="HelpContainer/HelpTxtRct/ExitHelp" to="." method="_on_ExitHelp_pressed"]
 [connection signal="pressed" from="OptionsContainer/OptionsPanel/ExitOptions" to="." method="_on_ExitOptions_pressed"]
 [connection signal="value_changed" from="OptionsContainer/OptionsPanel/CarSelect/CarScroll" to="." method="_on_CarScroll_value_changed"]
+[connection signal="drag_ended" from="OptionsContainer/OptionsPanel/Audio/SfxSlider" to="." method="_on_SfxSlider_drag_ended"]
+[connection signal="value_changed" from="OptionsContainer/OptionsPanel/Audio/SfxSlider" to="." method="_on_SfxSlider_value_changed"]
+[connection signal="value_changed" from="OptionsContainer/OptionsPanel/Audio/MusicSlider" to="." method="_on_MusicSlider_value_changed"]

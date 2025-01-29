@@ -4,6 +4,8 @@ extends Timer
 func _ready():
 	
 	start(60)
+	
+	$TimerDisplay.text = "Time: %s" % time_left
 
 
 func _physics_process(_delta):

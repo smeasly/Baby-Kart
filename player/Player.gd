@@ -14,10 +14,14 @@ var maxAngularAccel : float = 6
 var green_car = preload("res://player/car.png")
 var blue_car = preload("res://player/car2.png")
 var red_car = preload("res://player/car3.png")
-
 var carTypes = [green_car, blue_car, red_car]
-
 var currentType = 0
+
+var called: bool = false
+var shape: CollisionShape2D #empty collsion shape
+
+export var crashParticle : PackedScene #TODO make new particles specific for crash, currently using despawn particles
+var _particle : Object
 
 
 func _ready():
@@ -28,38 +32,41 @@ func _on_MainMenu_change_player_sprite(value):
 	$Sprite.texture = carTypes[value]
 	currentType = value
 
-func set_stats_from_carttype():
+func set_stats_from_carttype(): #currently unused behaviour
 	
 	match currentType:
-		0: #green_car
-			maxAngularAccel = 6
+		0: #green_car, default balanced
+			#maxAngularAccel = 5
 			#AngularAccelCoef = 0.7
 			#AngularDecelCoef = 0.35
 			#MAX_SPEED = 500
 			#MAX_BACKSPEED = 250
 			#ACCEL = 1000
 			#DECEL = 750
-			return 0
+			print("set type ", currentType)
+			return
 		
-		1: #blue_car
-			maxAngularAccel = 6
-			#AngularAccelCoef = 0.7
-			#AngularDecelCoef = 0.35
-			#MAX_SPEED = 500
-			#MAX_BACKSPEED = 250
-			#ACCEL = 1000
-			#DECEL = 750
-			return 1
+		1: #blue_car, better handling
+			#maxAngularAccel = 6.5
+			#AngularAccelCoef = 0.9
+			#AngularDecelCoef = 0.45
+			#MAX_SPEED = 450
+			#MAX_BACKSPEED = 200
+			#ACCEL = 925
+			#DECEL = 800
+			print("set type ", currentType)
+			return
 		
-		2: #red_car
-			maxAngularAccel = 6
-			#AngularAccelCoef = 0.7
-			#AngularDecelCoef = 0.35
-			#MAX_SPEED = 500
-			#MAX_BACKSPEED = 250
-			#ACCEL = 1000
-			#DECEL = 750
-			return 2
+		2: #red_car, better speed
+			#maxAngularAccel = 4
+			#AngularAccelCoef = 0.5
+			#AngularDecelCoef = 0.3
+			#MAX_SPEED = 750
+			#MAX_BACKSPEED = 300
+			#ACCEL = 1250
+			#DECEL = 650
+			print("set type ", currentType)
+			return
 
 
 func manual_input(delta):
@@ -92,19 +99,19 @@ func manual_input(delta):
 	#if inputLeft:
 	#	leftAccel += leftAccelAdd
 	
-	leftAccel = clamp(leftAccel, 0, 6)
-	rightAccel = clamp(rightAccel, 0, 6)
+	leftAccel = clamp(leftAccel, 0, 5)
+	rightAccel = clamp(rightAccel, 0, 5)
 	
-	if inputLeft: #&& (speed > 100 || backSpeed > 100):
-		leftAccel += 0.7
+	if inputLeft: #&& (speed > 125 || backSpeed > 200):
+		leftAccel += 0.6
 		direction -= leftAccel * delta
 		
 	elif !inputLeft: #and leftAccel != 0:
 		leftAccel -= 0.35
 		direction -= leftAccel * delta
 	
-	if inputRight: #&& (speed > 100 || backSpeed > 100):
-		rightAccel += 0.7
+	if inputRight: #&& (speed > 125 || backSpeed > 200):
+		rightAccel += 0.6
 		direction += rightAccel * delta
 		
 	elif !inputRight: #and rightAccel != 0:
@@ -143,27 +150,60 @@ func manual_input(delta):
 
 func _physics_process(delta):
 	
+	#INPUT
 	manual_input(delta)
 	rotation += direction
 	velocity = move_and_slide(velocity, Vector2(), false, 4, PI/4, true) #this last bool-var controls whether or not this object has infinite inertia.
 	
+	#PARTICLE TRAIL
 	if speed > 125: #|| backSpeed > 200:
 		$ParticleTrail.emitting = true
-	elif speed < 125 && $ParticleTrail.is_emitting() == true:
+		
+	elif speed <= 125 && $ParticleTrail.is_emitting() == true: #thanks John!!!
 		$ParticleTrail.emitting = false
 	
-	for index in get_slide_count(): #maybe use physics2ddirectspacestate collide_shape() here?
+	#COLLISION HANDLING
+	
+	if called == true:
+		var vx = abs(velocity.x)
+		var vy = abs(velocity.y)
+		if vx + vy > 420: #print(velocity.x, ":", velocity.y)
+			called = false
+	
+	for index in get_slide_count(): #for each collision event, called every frame of detected collision...
 		
-		var collision = get_slide_collision(index)
+		var collision = get_slide_collision(index) 
 		
-		if collision.collider.is_class("StaticBody2D"):
+		if collision.collider.is_class("StaticBody2D"): #slow down upon hitting an obstacle
 			speed -= (ACCEL * 2) * delta
+			backSpeed -= (ACCEL * 2) * delta
+		
+		if index > 0: #get_slide_collision(0) is called every frame, not exactly sure why, but doing n > 0 will at least lower compute cost
+			
+			if called == false: 
+				
+				if speed > 375:
+					_particle = crashParticle.instance()
+					_particle.position = collision.position
+					play_particle()
+					AudioStreamSfxManager.play("res://sfx/wall_bump.wav", true, 1.3, 0.7, 1.2)
+					
+				else:
+					AudioStreamSfxManager.play("res://sfx/wall_bump.wav", true, 0.0, 1.0, 1.5)
+				
+				called = true
+				shape = collision.collider_shape   #log set first collision with a shape
+			
+			#need to log last TWO shapes, to avoid issues of overcalling in corners/intersection of 2 shapes
+			if collision.collider_shape != shape: #can comment this out for more stable behaviour, but for now it works just fine
+				called = false
 		
 		#this following part of the block is my attempt at fixing the 'stop on collide' issue, caused when property
 		#infinite_inertia = false. it didn't work and is therefore commented out, but i may be able to get it to work later
 		#this implementation required putting ' export(float, 0, 1) var pushFactor ' at the head of the script
 		
-	#	if collision.collider.is_class("RigidBody2D"): 
+		if collision.collider.is_class("RigidBody2D"): 
+			print("poop")
 	#		clamp(pushFactor, 0, 1)
 	#		
 	#		if speed > 0:
@@ -172,6 +212,14 @@ func _physics_process(delta):
 	#			pushFactor = backSpeed / MAX_BACKSPEED
 	#		
 	#		collision.collider.apply_central_impulse(-collision.normal * velocity.length() * pushFactor)
+
+
+func play_particle():
+	
+	_particle.emitting = true
+	#_particle.color = color(0,1,1,1)
+	
+	get_tree().current_scene.call_deferred("add_child", _particle)
 
 
 #func _input(event):

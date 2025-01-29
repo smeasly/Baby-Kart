@@ -26,6 +26,10 @@ run/main_scene="res://Main.tscn"
 boot_splash/image="res://assets/splash.png"
 config/icon="res://assets/icon.png"
 
+[autoload]
+
+AudioStreamSfxManager="*res://AudioStreamSFXManager.gd"
+
 [display]
 
 window/size/resizable=false

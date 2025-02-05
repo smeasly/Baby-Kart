@@ -52,7 +52,7 @@ func _on_SfxSlider_value_changed(value):
 														#will fiddle with this later so make sure to change it accordingly!!
 
 func _on_SfxSlider_drag_ended(_value_changed):
-	AudioStreamSfxManager.play("res://sfx/glass ding.wav", true, -8, 0.5, 1.5)
+	AudioStreamSfxManager.play("res://sfx/cg_glass_ding.wav", true, -8, 0.5, 1.5)
 
 func _on_MusicSlider_value_changed(value):
 	AudioServer.set_bus_volume_db(MUSIC_BUS_ID, linear2db(value))

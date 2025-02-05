@@ -1,5 +1,6 @@
 extends Node
 
+
 func play(streamPath: String, randomize_pitch: bool = false, volume: float = 0.0, min_pitch: float = 1.0, max_pitch: float = 1.2) -> void:
 	
 	var audioStreamPlayer: AudioStreamPlayer = AudioStreamPlayer.new()
@@ -13,6 +14,7 @@ func play(streamPath: String, randomize_pitch: bool = false, volume: float = 0.0
 	else:
 		pitch = 1.0
 	
+	pause_mode = audioStreamPlayer.PAUSE_MODE_PROCESS #if not set to process, audio streams do not free themselves from memory when scene-tree is paused
 	audioStreamPlayer.bus = bus
 	audioStreamPlayer.stream = load(streamPath)
 	audioStreamPlayer.pitch_scale = pitch
@@ -23,3 +25,6 @@ func play(streamPath: String, randomize_pitch: bool = false, volume: float = 0.0
 	audioStreamPlayer.play()
 	yield(audioStreamPlayer, "finished")
 	audioStreamPlayer.queue_free()
+
+func _exit_tree():
+	print("ASsfxM exit tree")

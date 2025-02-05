@@ -8,7 +8,7 @@
 
 [sub_resource type="PhysicsMaterial" id=6]
 resource_local_to_scene = true
-bounce = 0.3
+bounce = 0.45
 
 [sub_resource type="CircleShape2D" id=9]
 resource_local_to_scene = true
@@ -24,9 +24,11 @@ colors = PoolColorArray( 0, 0.054902, 0.0588235, 0, 0, 0.597656, 0.541626, 1 )
 [node name="Ball" type="RigidBody2D"]
 position = Vector2( 303, 278 )
 z_index = -1
-mass = 0.816326
 physics_material_override = SubResource( 6 )
 gravity_scale = 0.0
+contacts_reported = 2
+contact_monitor = true
+sleeping = true
 script = ExtResource( 4 )
 spawnParticle = ExtResource( 5 )
 despawnParticle = ExtResource( 6 )
@@ -48,6 +50,7 @@ gradient = SubResource( 7 )
 script = ExtResource( 3 )
 
 [node name="VisibilityNotifier2D" type="VisibilityNotifier2D" parent="."]
-position = Vector2( -0.499992, 0 )
+position = Vector2( -4.35114e-06, -5.38826e-05 )
+scale = Vector2( 2, 1.95122 )
 
 [connection signal="screen_exited" from="VisibilityNotifier2D" to="." method="_on_VisibilityNotifier2D_screen_exited"]

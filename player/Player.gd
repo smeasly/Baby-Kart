@@ -6,15 +6,15 @@ const ACCEL : int = 1000; const DECEL : int = 750
 
 var direction : float
 var leftAccel : float; var rightAccel : float
-var speed : float = 0; var backSpeed : float = 0 #not *actual* speed
+var speed : float = 0; var backSpeed : float = 0 #not *actual* speed, it's a scaling multiplier for velocity
 var velocity = Vector2.ZERO
 
 var maxAngularAccel : float = 6
 
-var green_car = preload("res://player/car.png")
-var blue_car = preload("res://player/car2.png")
-var red_car = preload("res://player/car3.png")
-var carTypes = [green_car, blue_car, red_car]
+const GREEN_CAR = preload("res://player/car.png")
+const BLUE_CAR = preload("res://player/car2.png")
+const RED_CAR = preload("res://player/car3.png")
+var carTypes = [GREEN_CAR, BLUE_CAR, RED_CAR]
 var currentType = 0
 
 var called: bool = false
@@ -32,10 +32,10 @@ func _on_MainMenu_change_player_sprite(value):
 	$Sprite.texture = carTypes[value]
 	currentType = value
 
-func set_stats_from_carttype(): #currently unused behaviour
+func set_stats_from_cartype(): #currently unused behaviour
 	
 	match currentType:
-		0: #green_car, default balanced
+		0: #GREEN_CAR, default balanced
 			#maxAngularAccel = 5
 			#AngularAccelCoef = 0.7
 			#AngularDecelCoef = 0.35
@@ -46,7 +46,7 @@ func set_stats_from_carttype(): #currently unused behaviour
 			print("set type ", currentType)
 			return
 		
-		1: #blue_car, better handling
+		1: #BLUE_CAR, better handling
 			#maxAngularAccel = 6.5
 			#AngularAccelCoef = 0.9
 			#AngularDecelCoef = 0.45
@@ -57,7 +57,7 @@ func set_stats_from_carttype(): #currently unused behaviour
 			print("set type ", currentType)
 			return
 		
-		2: #red_car, better speed
+		2: #RED_CAR, better speed
 			#maxAngularAccel = 4
 			#AngularAccelCoef = 0.5
 			#AngularDecelCoef = 0.3
@@ -127,7 +127,6 @@ func manual_input(delta):
 	#	direction += rightAccel * delta
 	
 	#ACCELERATION AND DECELERATION
-	
 	speed = clamp(speed, 0, MAX_SPEED)
 	backSpeed = clamp(backSpeed, 0, MAX_BACKSPEED)
 	
@@ -148,26 +147,77 @@ func manual_input(delta):
 		velocity += Vector2.DOWN.rotated(rotation) * backSpeed
 
 
+#func collision(delta):
+#
+##COLLISION HANDLING & COLLISION SOUNDS + COLLISION PARTICLES
+#	if called == true: #set flag for collision sound
+#		var vx = abs(velocity.x)
+#		var vy = abs(velocity.y)
+#		if vx + vy > 420: #check: print(velocity.x, ":", velocity.y)
+#			called = false
+#
+#	for index in get_slide_count(): #for each collision event, called every frame of detected collision...
+#
+#		var collision = get_slide_collision(index) 
+#
+#		if collision.collider.is_class("StaticBody2D"): #slow down upon hitting an obstacle
+#			speed -= (ACCEL * 2) * delta
+#			backSpeed -= (ACCEL * 2) * delta
+#
+#		if index > 0: #get_slide_collision(0) is called every frame, not exactly sure why, but doing n > 0 will at least lower compute cost
+#
+#			if called == false: 
+#
+#				if speed > 375:
+#					_particle = crashParticle.instance()
+#					_particle.position = collision.position
+#					play_particle()
+#					AudioStreamSfxManager.play("res://sfx/wall_bump.wav", true, 1.3, 0.7, 1.2)
+#
+#				else:
+#					AudioStreamSfxManager.play("res://sfx/wall_bump.wav", true, 0.0, 1.0, 1.5)
+#
+#				shape = collision.collider_shape   #log set first collision with a shape
+#				called = true
+#
+#			#need to log last TWO shapes, to avoid issues of overcalling in corners/intersection of 2 shapes
+#			if collision.collider_shape != shape: #can comment this out for potentially more stable behaviour, but for now it works just fine
+#				called = false
+
+
 func _physics_process(delta):
 	
 	#INPUT
 	manual_input(delta)
 	rotation += direction
-	velocity = move_and_slide(velocity, Vector2(), false, 4, PI/4, true) #this last bool-var controls whether or not this object has infinite inertia.
+	velocity = move_and_slide(velocity, Vector2(), false, 4, PI/4, true) #this last bool controls whether or not this object has infinite inertia.
 	
-	#PARTICLE TRAIL
+	#PARTICLE TRAIL & CAR MOVEMENT SOUNDS
 	if speed > 125: #|| backSpeed > 200:
 		$ParticleTrail.emitting = true
+		#$AudioStreamPlayer.queuePlay = true
 		
-	elif speed <= 125 && $ParticleTrail.is_emitting() == true: #thanks John!!!
+	elif speed <= 125 && $ParticleTrail.is_emitting() == true:
 		$ParticleTrail.emitting = false
+		#$AudioStreamPlayer.queuePlay = false
 	
-	#COLLISION HANDLING
+	if speed >= 125:
+		$AudioStreamPlayer.queuePlay = true
+		
+	elif speed <= 175:
+		$AudioStreamPlayer.queuePlay = false
+		
+	elif speed <= 15:
+		$AudioStreamPlayer.stop()
+
 	
-	if called == true:
+	#COLLISION HANDLING & COLLISION SOUNDS + COLLISION PARTICLES
+	#collision(delta)
+	if called == true: #set flag for collision sound
 		var vx = abs(velocity.x)
 		var vy = abs(velocity.y)
-		if vx + vy > 420: #print(velocity.x, ":", velocity.y)
+		
+		if vx + vy > 420: #check: print(vx, ":", vy)
 			called = false
 	
 	for index in get_slide_count(): #for each collision event, called every frame of detected collision...
@@ -191,19 +241,16 @@ func _physics_process(delta):
 				else:
 					AudioStreamSfxManager.play("res://sfx/wall_bump.wav", true, 0.0, 1.0, 1.5)
 				
-				called = true
 				shape = collision.collider_shape   #log set first collision with a shape
+				called = true
 			
 			#need to log last TWO shapes, to avoid issues of overcalling in corners/intersection of 2 shapes
-			if collision.collider_shape != shape: #can comment this out for more stable behaviour, but for now it works just fine
+			if collision.collider_shape != shape: #can comment this out for potentially more stable behaviour, but for now it works just fine
 				called = false
 		
 		#this following part of the block is my attempt at fixing the 'stop on collide' issue, caused when property
 		#infinite_inertia = false. it didn't work and is therefore commented out, but i may be able to get it to work later
 		#this implementation required putting ' export(float, 0, 1) var pushFactor ' at the head of the script
-		
-		if collision.collider.is_class("RigidBody2D"): 
-			print("poop")
 	#		clamp(pushFactor, 0, 1)
 	#		
 	#		if speed > 0:
@@ -220,18 +267,6 @@ func play_particle():
 	#_particle.color = color(0,1,1,1)
 	
 	get_tree().current_scene.call_deferred("add_child", _particle)
-
-
-#func _input(event):
-#	if event is InputEventMouseButton:
-#		if event.button_index == BUTTON_RIGHT and event.pressed:
-#			#need to turn off trails temporarily here
-#			position = get_viewport().get_mouse_position()
-#			#not sure how to implement 'dropping' effect here. maybe create separate function for tweening car to new location
-#			#and then do some resizing process in this block. might need _process()?
-#			if $Sprite.scale(Vector2(3, 3)):
-#			$Sprite.scale(1, 1) * delta
-#			resize($Car.png)
 
 
 func _on_Main_reset():

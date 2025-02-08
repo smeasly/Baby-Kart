@@ -14,37 +14,59 @@ onready var MUSIC_BUS_ID = AudioServer.get_bus_index("Music")
 
 signal change_player_sprite
 
-
+var startedFlag : bool = false
 
 func _ready():
 	show()
 
 
 func _on_Play_pressed():
+	
 	hide() #TODO change menu configuration from on start menu to pause/resume menu. ie: change play to resume, add try again button.
 	$Play.text = "Resume"
+	startedFlag = true
 	AudioStreamSfxManager.play("res://sfx/cg_pop_1.wav", true, 0.0, 0.5, 1.5)
 
 
 #Options
 func _on_Options_pressed():
+	
 	$OptionsContainer.show()
 	AudioStreamSfxManager.play("res://sfx/cg_pop_1.wav", true, 0.0, 0.5, 1.5)
 
-func _scroll_value(): #currently unused behaviour
-	
-	for index in carTypes.size():
-		if carScroll.value == index:
-			
-			pass
-	#var h: int = $OptionsContainer/OptionsPanel/CarSelect/3CarScrollBar.ratio
-	#modColour = Color.from_hsv(h, 1, 1, 1)
-	#$OptionsContainer/OptionsPanel/CarSelect/Sprite.self_modulate = modColour
-
 func _on_CarScroll_value_changed(value):
+	
 	emit_signal("change_player_sprite", value)
 	carSprite.texture = carTypes[carScroll.value]
+	set_car_select_text(value)
 	AudioStreamSfxManager.play("res://sfx/cg_pop_1.wav", true, 0.0, 0.5, 1.5)
+
+func set_car_select_text(value : int):
+	
+	match value:
+		0: #GREEN_CAR, default balanced
+			$OptionsContainer/OptionsPanel/CarSelect/CarStatLabel.text = """Green Car:
+				
+			- Balanced turning.
+			
+			- Balanced speed."""
+			return
+		
+		1: #BLUE_CAR, better turning, worse speed
+			$OptionsContainer/OptionsPanel/CarSelect/CarStatLabel.text = """Blue Car:
+				
+			- Better turning.
+			
+			- Worse speed."""
+			return
+		
+		2: #RED_CAR, better speed, worse turning
+			$OptionsContainer/OptionsPanel/CarSelect/CarStatLabel.text = """Blue Car:
+				
+			- Better speed.
+			
+			- Worse turning."""
+			return
 
 func _on_SfxSlider_value_changed(value):
 	AudioServer.set_bus_volume_db(SFX_BUS_ID, linear2db(value))

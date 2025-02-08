@@ -1,26 +1,29 @@
 extends KinematicBody2D
 
 
-const MAX_SPEED : int = 500; const MAX_BACKSPEED : int = 250
-const ACCEL : int = 1000; const DECEL : int = 750
+var MAX_SPEED : int = 500; var MAX_BACKSPEED : int = 250
+var ACCEL : int = 1000; var DECEL : int = 750
 
 var direction : float
 var leftAccel : float; var rightAccel : float
 var speed : float = 0; var backSpeed : float = 0 #not *actual* speed, it's a scaling multiplier for velocity
 var velocity = Vector2.ZERO
 
-var maxAngularAccel : float = 6
+var maxAngularAccel : float = 5
+
+var angularAccelCoef : float = 0.6
+var angularDecelCoef : float = 0.35
 
 const GREEN_CAR = preload("res://player/car.png")
 const BLUE_CAR = preload("res://player/car2.png")
 const RED_CAR = preload("res://player/car3.png")
-var carTypes = [GREEN_CAR, BLUE_CAR, RED_CAR]
-var currentType = 0
+#const PURPLE_CAR = preload("res://player/car4.png") #Was supposed to impart more bounce to ball, but i can't seem to make a Kinematic body work like that.
+var carTypes : Array = [GREEN_CAR, BLUE_CAR, RED_CAR]
 
 var called: bool = false
 var shape: CollisionShape2D #empty collsion shape
 
-export var crashParticle : PackedScene #TODO make new particles specific for crash, currently using despawn particles
+export var crashParticle : PackedScene
 var _particle : Object
 
 
@@ -28,44 +31,42 @@ func _ready():
 	rotation_degrees = 90
 
 
+#CHOOSE CAR COLOR AND STATS
 func _on_MainMenu_change_player_sprite(value):
 	$Sprite.texture = carTypes[value]
-	currentType = value
+	set_stats_from_cartype(value)
 
-func set_stats_from_cartype(): #currently unused behaviour
+func set_stats_from_cartype(value : int):
 	
-	match currentType:
+	match value:
 		0: #GREEN_CAR, default balanced
-			#maxAngularAccel = 5
-			#AngularAccelCoef = 0.7
-			#AngularDecelCoef = 0.35
-			#MAX_SPEED = 500
-			#MAX_BACKSPEED = 250
-			#ACCEL = 1000
-			#DECEL = 750
-			print("set type ", currentType)
+			maxAngularAccel = 5.5
+			angularAccelCoef = 0.65
+			angularDecelCoef = 0.35
+			MAX_SPEED = 515
+			MAX_BACKSPEED = 275
+			ACCEL = 1000
+			DECEL = 750
 			return
 		
-		1: #BLUE_CAR, better handling
-			#maxAngularAccel = 6.5
-			#AngularAccelCoef = 0.9
-			#AngularDecelCoef = 0.45
-			#MAX_SPEED = 450
-			#MAX_BACKSPEED = 200
-			#ACCEL = 925
-			#DECEL = 800
-			print("set type ", currentType)
+		1: #BLUE_CAR, better turning, worse speed
+			maxAngularAccel = 7
+			angularAccelCoef = 0.9
+			angularDecelCoef = 0.45
+			MAX_SPEED = 475
+			MAX_BACKSPEED = 200
+			ACCEL = 925
+			DECEL = 800
 			return
 		
-		2: #RED_CAR, better speed
-			#maxAngularAccel = 4
-			#AngularAccelCoef = 0.5
-			#AngularDecelCoef = 0.3
-			#MAX_SPEED = 750
-			#MAX_BACKSPEED = 300
-			#ACCEL = 1250
-			#DECEL = 650
-			print("set type ", currentType)
+		2: #RED_CAR, better speed, worse turning
+			maxAngularAccel = 5.5
+			angularAccelCoef = 0.5
+			angularDecelCoef = 0.3
+			MAX_SPEED = 650
+			MAX_BACKSPEED = 375
+			ACCEL = 1250
+			DECEL = 650
 			return
 
 
@@ -99,23 +100,23 @@ func manual_input(delta):
 	#if inputLeft:
 	#	leftAccel += leftAccelAdd
 	
-	leftAccel = clamp(leftAccel, 0, 5)
-	rightAccel = clamp(rightAccel, 0, 5)
+	leftAccel = clamp(leftAccel, 0, maxAngularAccel)
+	rightAccel = clamp(rightAccel, 0, maxAngularAccel)
 	
 	if inputLeft: #&& (speed > 125 || backSpeed > 200):
-		leftAccel += 0.6
+		leftAccel += angularAccelCoef
 		direction -= leftAccel * delta
 		
 	elif !inputLeft: #and leftAccel != 0:
-		leftAccel -= 0.35
+		leftAccel -= angularDecelCoef
 		direction -= leftAccel * delta
 	
 	if inputRight: #&& (speed > 125 || backSpeed > 200):
-		rightAccel += 0.6
+		rightAccel += angularAccelCoef
 		direction += rightAccel * delta
 		
 	elif !inputRight: #and rightAccel != 0:
-		rightAccel -= 0.35
+		rightAccel -= angularDecelCoef
 		direction += rightAccel * delta
 	
 	#if inputLeft && (!inputDown || !inputUp):
@@ -147,72 +148,7 @@ func manual_input(delta):
 		velocity += Vector2.DOWN.rotated(rotation) * backSpeed
 
 
-#func collision(delta):
-#
-##COLLISION HANDLING & COLLISION SOUNDS + COLLISION PARTICLES
-#	if called == true: #set flag for collision sound
-#		var vx = abs(velocity.x)
-#		var vy = abs(velocity.y)
-#		if vx + vy > 420: #check: print(velocity.x, ":", velocity.y)
-#			called = false
-#
-#	for index in get_slide_count(): #for each collision event, called every frame of detected collision...
-#
-#		var collision = get_slide_collision(index) 
-#
-#		if collision.collider.is_class("StaticBody2D"): #slow down upon hitting an obstacle
-#			speed -= (ACCEL * 2) * delta
-#			backSpeed -= (ACCEL * 2) * delta
-#
-#		if index > 0: #get_slide_collision(0) is called every frame, not exactly sure why, but doing n > 0 will at least lower compute cost
-#
-#			if called == false: 
-#
-#				if speed > 375:
-#					_particle = crashParticle.instance()
-#					_particle.position = collision.position
-#					play_particle()
-#					AudioStreamSfxManager.play("res://sfx/wall_bump.wav", true, 1.3, 0.7, 1.2)
-#
-#				else:
-#					AudioStreamSfxManager.play("res://sfx/wall_bump.wav", true, 0.0, 1.0, 1.5)
-#
-#				shape = collision.collider_shape   #log set first collision with a shape
-#				called = true
-#
-#			#need to log last TWO shapes, to avoid issues of overcalling in corners/intersection of 2 shapes
-#			if collision.collider_shape != shape: #can comment this out for potentially more stable behaviour, but for now it works just fine
-#				called = false
-
-
-func _physics_process(delta):
-	
-	#INPUT
-	manual_input(delta)
-	rotation += direction
-	velocity = move_and_slide(velocity, Vector2(), false, 4, PI/4, true) #this last bool controls whether or not this object has infinite inertia.
-	
-	#PARTICLE TRAIL & CAR MOVEMENT SOUNDS
-	if speed > 125: #|| backSpeed > 200:
-		$ParticleTrail.emitting = true
-		#$AudioStreamPlayer.queuePlay = true
-		
-	elif speed <= 125 && $ParticleTrail.is_emitting() == true:
-		$ParticleTrail.emitting = false
-		#$AudioStreamPlayer.queuePlay = false
-	
-	if speed >= 125:
-		$AudioStreamPlayer.queuePlay = true
-		
-	elif speed <= 175:
-		$AudioStreamPlayer.queuePlay = false
-		
-	elif speed <= 15:
-		$AudioStreamPlayer.stop()
-
-	
-	#COLLISION HANDLING & COLLISION SOUNDS + COLLISION PARTICLES
-	#collision(delta)
+func collision(delta):
 	if called == true: #set flag for collision sound
 		var vx = abs(velocity.x)
 		var vy = abs(velocity.y)
@@ -259,6 +195,37 @@ func _physics_process(delta):
 	#			pushFactor = backSpeed / MAX_BACKSPEED
 	#		
 	#		collision.collider.apply_central_impulse(-collision.normal * velocity.length() * pushFactor)
+
+
+func _physics_process(delta):
+	
+	#INPUT
+	manual_input(delta)
+	rotation += direction
+	velocity = move_and_slide(velocity, Vector2(), false, 4, PI/4, true) #this last bool controls whether or not this object has infinite inertia.
+	
+	#PARTICLE TRAIL & CAR MOVEMENT SOUNDS
+	if speed > 125: #|| backSpeed > 200:
+		$ParticleTrail.emitting = true
+		#$AudioStreamPlayer.queuePlay = true
+		if $ParticleTrail.visible == false:
+			$ParticleTrail.show()
+		
+	elif speed <= 125 && $ParticleTrail.is_emitting() == true:
+		$ParticleTrail.emitting = false
+		#$AudioStreamPlayer.queuePlay = false
+	
+	if speed >= 125:
+		$AudioStreamPlayer.queuePlay = true
+		
+	elif speed <= 175:
+		$AudioStreamPlayer.queuePlay = false
+		
+	elif speed <= 15:
+		$AudioStreamPlayer.stop()
+	
+	#COLLISION
+	collision(delta)
 
 
 func play_particle():

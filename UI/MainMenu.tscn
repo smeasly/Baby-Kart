@@ -102,11 +102,13 @@ text = "X"
 [node name="CarStatLabel" type="Label" parent="OptionsContainer/OptionsPanel/CarSelect"]
 margin_left = 105.0
 margin_top = 33.0
-margin_right = 209.0
+margin_right = 233.0
 margin_bottom = 121.0
-text = "- Lorem ipsum dolor sit amet
-- consectetur adipiscing elit
-- sed do..."
+text = "Green Car:
+
+- Balanced turning.
+
+- Balanced speed."
 autowrap = true
 
 [node name="Sprite" type="Sprite" parent="OptionsContainer/OptionsPanel/CarSelect"]
@@ -165,6 +167,16 @@ step = 0.01
 value = 1.0
 tick_count = 25
 ticks_on_borders = true
+
+[node name="HighScoreDisplay" type="Label" parent="."]
+margin_left = 320.0
+margin_top = 536.0
+margin_right = 704.0
+margin_bottom = 576.0
+theme = ExtResource( 1 )
+text = "Hi-Score: %s"
+align = 1
+valign = 1
 
 [connection signal="pressed" from="Play" to="." method="_on_Play_pressed"]
 [connection signal="pressed" from="Options" to="." method="_on_Options_pressed"]

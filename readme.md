@@ -11,6 +11,4 @@ The object of the game is to push the ball into the net before the time limit ru
 - Pickups to add more time
 
 ### Planned/Currently Unimplemented Features
-- In-game music, and context-sensitive music system.
-- Writing high-score to file
 - Controller support

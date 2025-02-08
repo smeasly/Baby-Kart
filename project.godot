@@ -29,6 +29,7 @@ config/icon="res://assets/icon.png"
 [autoload]
 
 AudioStreamSfxManager="*res://AudioStreamSFXManager.gd"
+SpawnCheck="*res://SpawnCheck.gd"
 
 [display]
 

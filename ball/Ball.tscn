@@ -3,8 +3,8 @@
 [ext_resource path="res://ball/ball.png" type="Texture" id=1]
 [ext_resource path="res://ball/BallTrailLine2D.gd" type="Script" id=3]
 [ext_resource path="res://ball/Ball.gd" type="Script" id=4]
-[ext_resource path="res://SpawnParticle.tscn" type="PackedScene" id=5]
-[ext_resource path="res://DespawnParticle.tscn" type="PackedScene" id=6]
+[ext_resource path="res://assets/SpawnParticle.tscn" type="PackedScene" id=5]
+[ext_resource path="res://assets/DespawnParticle.tscn" type="PackedScene" id=6]
 
 [sub_resource type="PhysicsMaterial" id=6]
 resource_local_to_scene = true
@@ -51,6 +51,5 @@ script = ExtResource( 3 )
 
 [node name="VisibilityNotifier2D" type="VisibilityNotifier2D" parent="."]
 position = Vector2( -4.35114e-06, -5.38826e-05 )
-scale = Vector2( 2, 1.95122 )
 
 [connection signal="screen_exited" from="VisibilityNotifier2D" to="." method="_on_VisibilityNotifier2D_screen_exited"]

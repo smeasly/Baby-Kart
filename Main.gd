@@ -1,4 +1,4 @@
-#keep score, write highscore to file, and handle pausing and opening menus/displaying state
+#keep score, write highscore to file, and handle spawning, pausing and opening menus/displays
 
 extends Node
 
@@ -9,12 +9,13 @@ class_name Main
 export var pickup : PackedScene
 export var ball : PackedScene
 
-signal new_high_score
-signal get_new_position
 signal reset
 
 var score : int = 0
-var highScore : int = 150 #no JSON file yet, so just for now, this is the determiner for default hi-score
+var highScore : int
+
+const SAVE_PATH = "user://babykart_save.ini"
+
 var queuePickup : bool
 var pickupSpawnIncr : int = 0
 
@@ -23,14 +24,18 @@ var nextPos : Vector2
 
 var firstStart: bool = true
 
-onready var SpawnCheck: Object = $SpawnCheck
-
 
 func _ready():
 	
 	get_tree().paused = true
 	
+	$AudioStreamPlayer.play()
+	
 	$ScoreDisplay.text = "Score: 0"
+	
+	load_score()
+	
+	$MainMenu/HighScoreDisplay.text = "Hi-Score: %s" % highScore
 
 
 func _on_Play_pressed():
@@ -39,6 +44,9 @@ func _on_Play_pressed():
 	$OpenMenu.show()
 	
 	if firstStart == true:
+		
+		$AudioStreamPlayer.stop()
+		
 		queuePickup = true
 		
 		$PlayerCar.show()
@@ -47,16 +55,14 @@ func _on_Play_pressed():
 		$Environment/ToyBlocks.show()
 		$Net.show()
 		
-		countdown() #add countdown timer func here, make it still pause, need coroutine maybe
-		
-		emit_signal("get_new_position")
-		nextPos = newPos  #kind of hacky. save a position on pickup, use this pos for next pickups spawn to avoid overlapping with ball spawn
+		countdown()
 		
 		spawn_ball()
 		
 		firstStart = false
 
 
+#PAUSING/UNPAUSING THE GAME AND OPENING/CLOSING THE MENU
 func _on_OpenMenu_pressed():
 	
 	get_tree().paused = true
@@ -64,12 +70,27 @@ func _on_OpenMenu_pressed():
 	$OpenMenu.hide()
 	$MainMenu.show()
 
-
-#func _input(event : InputEvent):
-#	if event is InputEventKey:
-#		if event.is_action_pressed("ui_cancel"):
-#			var isPaused : bool = get_tree().paused
-#			get_tree().paused = !isPaused
+func _input(event): #pause w/ esc key
+	
+	if event is InputEventKey:
+		
+		if event.pressed && event.scancode == KEY_ESCAPE && !get_tree().paused:
+			
+			get_tree().paused = true
+			
+			$OpenMenu.hide()
+			$MainMenu.show()
+			
+			#unpausing with escape key
+			#doesn't work with pause mode, if main's pause process wasn't set to inherit, the following would cause unintended behaviour anyway.
+#		elif event.pressed && event.scancode == KEY_ESCAPE && get_tree().paused && $MainMenu.visible: 
+#			
+#			get_tree().paused = false
+#			
+#			$MainMenu.hide()
+#			
+#		else:
+#			pass
 
 
 func spawn_ball():
@@ -77,11 +98,11 @@ func spawn_ball():
 	var _ball = ball.instance()
 	
 	if firstStart:
-		pass
+		_ball.position = Vector2(512, 300)
+		
 	else:
-		emit_signal("get_new_position")
+		_ball.position = SpawnCheck.get_new_position($PlayerCar.position)
 	
-	_ball.position = newPos
 	call_deferred("add_child", _ball)
 	
 	AudioStreamSfxManager.play("res://sfx/cg_pop_1.wav", true, 0.0, 0.8, 1.5)
@@ -89,14 +110,30 @@ func spawn_ball():
 
 func spawn_pickup():
 	
+	SpawnCheck.pickupActive = true
+	
 	var _pickup = pickup.instance()
 	
-	emit_signal("get_new_position")
-	
-	_pickup.position = nextPos
+	_pickup.position = SpawnCheck.pickupPosition #nextPos
 	call_deferred("add_child", _pickup)
 	
+	#AudioStreamSfxManager.play("res://sfx/cg_pop_1.wav", true, 0.0, 0.8, 1.5)
+	
 	queuePickup = false
+	pickupSpawnIncr = 0
+
+
+func _on_HourglassPickup_pickup():
+	
+	SpawnCheck.pickupActive = false
+	
+	score += 2
+	$ScoreDisplay.text = "Score: %s" % score
+	
+	queuePickup = true
+	
+	AudioStreamSfxManager.play("res://sfx/crystal_twinkle.wav", true, -3)
+	
 	pickupSpawnIncr = 0
 
 
@@ -111,49 +148,62 @@ func _on_NetDetectArea2D_score():
 	
 	spawn_ball()
 	
-	if pickupSpawnIncr == 1: #inbetween 0 and 2, set the next position for pickup spawn workaround. 
-		nextPos = newPos #kind of hacky. save a position on pickup, use this pos for next pickups spawn to avoid overlapping with ball spawn
-	
 	if queuePickup == true && pickupSpawnIncr >= 2:
 		spawn_pickup()
+
+
+func check_highscore():
 	
-	if score > highScore: #TODO write highscore to file
+	if score > highScore:
 		highScore = score 
-		emit_signal("new_high_score")
-		AudioStreamSfxManager.play("res://sfx/cg_yeah.wav", false, -7)
+		return true
+	else:
+		return false
 
+func save_score() -> void:
+	
+	var config := ConfigFile.new()
+	
+	config.set_value("Highscores", "highscore", highScore)
+	config.save(SAVE_PATH)
+	
+#	var error := config.save(SAVE_PATH)
+#	if error != OK:
+#		print("An error occured while saving: ", error)
 
-func _on_HourglassPickup_pickup():
+func load_score() -> void:
 	
-	score += 2
-	$ScoreDisplay.text = "Score: %s" % score
+	var config := ConfigFile.new()
 	
-	queuePickup = true
+	var error := config.load(SAVE_PATH)
 	
-	emit_signal("get_new_position")
-	
-	AudioStreamSfxManager.play("res://sfx/crystal_twinkle.wav", true, -4)
-	
-	if score > highScore: #TODO write highscore to file
-		highScore = score
-		emit_signal("new_high_score")
-		AudioStreamSfxManager.play("res://sfx/cg_yeah.wav", false, -7)
-	
-	pickupSpawnIncr = 0
-
-
-func _on_SpawnCheck_newPosition(safePosition):
-	
-	newPos = safePosition
+	if error == OK:
+		highScore = config.get_value("Highscores", "highscore")
+	elif error == ERR_FILE_NOT_FOUND:
+		highScore = 99
+		save_score()
+	else:
+		printerr("An error occured while loading highscore: ", error)
 
 
 func _on_Timer_timeout():
 	
-	AudioStreamSfxManager.play("res://sfx/cg_aww.wav", false, -7)
+	$AudioStreamPlayer.stop()
+	
+	$GameOver/HighScoreDisplay.text = "Hi-Score: %s" % highScore
+	
+	if check_highscore() == true:
+		$GameOver/LabelFinalScore.text = "You Set A New Hi-Score!: %s" % score
+		$GameOver/HighScoreDisplay.text = "New Hi-Score!: %s" % highScore
+		$MainMenu/HighScoreDisplay.text = "Hi-Score: %s" % highScore
+		AudioStreamSfxManager.play("res://sfx/cg_yeah.wav", false, -7)
+		save_score()
+		
+	else:
+		$GameOver/LabelFinalScore.text = "Your Final Score: %s" % score
+		AudioStreamSfxManager.play("res://sfx/cg_aww.wav", false, -7)
 	
 	get_tree().paused = true
-	
-	$GameOver/VBoxContainer/LabelFinalScore.text = "Your Score: %s" % score
 	
 	$GameOver.show()
 
@@ -170,32 +220,41 @@ func _on_TryAgain_pressed():
 	
 	$ScoreDisplay.text = "Score: %s" % score
 	
+	$PlayerCar/ParticleTrail.hide()
+	
 	emit_signal("reset")
 
 
-func countdown():
+func countdown(): #Countdown at the start of the round
 	
-	$RichTextLabel.show()
+	$RichTextLabel.show() #I want to add some text effects to this label, but syncing it with the timer and displaying correctly is a pain
+	$OpenMenu.hide()
+	
 	get_tree().paused = true
 	
 	yield(get_tree().create_timer(0.5), "timeout")
 	$RichTextLabel.bbcode_text = "[center]3[/center]"
-	AudioStreamSfxManager.play("res://sfx/cg_cowbell.wav", false, 0.8)
+	AudioStreamSfxManager.play("res://sfx/cg_cowbell.wav", false, -5)
 	
 	yield(get_tree().create_timer(1.0), "timeout")
 	$RichTextLabel.bbcode_text = "[center]2[/center]"
-	AudioStreamSfxManager.play("res://sfx/cg_cowbell.wav", false, 0.8)
+	AudioStreamSfxManager.play("res://sfx/cg_cowbell.wav", false, -5)
 	
 	yield(get_tree().create_timer(1.0), "timeout")
 	$RichTextLabel.bbcode_text = "[center]1[/center]"
-	AudioStreamSfxManager.play("res://sfx/cg_cowbell.wav", false, 0.8)
+	AudioStreamSfxManager.play("res://sfx/cg_cowbell.wav", false, -5)
 	
 	yield(get_tree().create_timer(1.0), "timeout")
 	$RichTextLabel.bbcode_text = "[center]Go![/center]"
 	AudioStreamSfxManager.play("res://sfx/cg_yeah.wav", false, -5)
+	
 	get_tree().paused = false
 	
+	$OpenMenu.show()
+	$AudioStreamPlayer.play()
+	
 	yield(get_tree().create_timer(0.5), "timeout")
+	
 	$RichTextLabel.hide()
 	$RichTextLabel.bbcode_text = ""
 

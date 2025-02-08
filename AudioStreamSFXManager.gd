@@ -25,6 +25,3 @@ func play(streamPath: String, randomize_pitch: bool = false, volume: float = 0.0
 	audioStreamPlayer.play()
 	yield(audioStreamPlayer, "finished")
 	audioStreamPlayer.queue_free()
-
-func _exit_tree():
-	print("ASsfxM exit tree")

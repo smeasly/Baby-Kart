@@ -21,28 +21,26 @@ func _ready():
 
 
 func _on_Play_pressed():
-	
 	hide() #TODO change menu configuration from on start menu to pause/resume menu. ie: change play to resume, add try again button.
 	$Play.text = "Resume"
+	$Exit.rect_size.x = 128
+	$Restart.show()
 	startedFlag = true
 	AudioStreamSfxManager.play("res://sfx/cg_pop_1.wav", true, 0.0, 0.5, 1.5)
 
 
-#Options
+#OPTIONS
 func _on_Options_pressed():
-	
 	$OptionsContainer.show()
 	AudioStreamSfxManager.play("res://sfx/cg_pop_1.wav", true, 0.0, 0.5, 1.5)
 
 func _on_CarScroll_value_changed(value):
-	
 	emit_signal("change_player_sprite", value)
 	carSprite.texture = carTypes[carScroll.value]
 	set_car_select_text(value)
 	AudioStreamSfxManager.play("res://sfx/cg_pop_1.wav", true, 0.0, 0.5, 1.5)
 
 func set_car_select_text(value : int):
-	
 	match value:
 		0: #GREEN_CAR, default balanced
 			$OptionsContainer/OptionsPanel/CarSelect/CarStatLabel.text = """Green Car:
@@ -61,7 +59,7 @@ func set_car_select_text(value : int):
 			return
 		
 		2: #RED_CAR, better speed, worse turning
-			$OptionsContainer/OptionsPanel/CarSelect/CarStatLabel.text = """Blue Car:
+			$OptionsContainer/OptionsPanel/CarSelect/CarStatLabel.text = """Red Car:
 				
 			- Better speed.
 			
@@ -70,24 +68,23 @@ func set_car_select_text(value : int):
 
 func _on_SfxSlider_value_changed(value):
 	AudioServer.set_bus_volume_db(SFX_BUS_ID, linear2db(value))
-	AudioServer.set_bus_mute(SFX_BUS_ID, value < 0.01)	#where the float value = slider step
-														#will fiddle with this later so make sure to change it accordingly!!
+	AudioServer.set_bus_mute(SFX_BUS_ID, value < 0.01)
 
 func _on_SfxSlider_drag_ended(_value_changed):
 	AudioStreamSfxManager.play("res://sfx/cg_glass_ding.wav", true, -8, 0.5, 1.5)
 
 func _on_MusicSlider_value_changed(value):
 	AudioServer.set_bus_volume_db(MUSIC_BUS_ID, linear2db(value))
-	AudioServer.set_bus_mute(MUSIC_BUS_ID, value < 0.01)	#where the float value = slider step
-															#will fiddle with this later so make sure to change it accordingly!!
+	AudioServer.set_bus_mute(MUSIC_BUS_ID, value < 0.01)
 
 func _on_ExitOptions_pressed():
 	$OptionsContainer.hide()
 	AudioStreamSfxManager.play("res://sfx/cg_pop_1.wav", true, 0.0, 0.5, 1.5)
 
-#How To Play
 
+#HOW TO PLAY
 func _on_HowToPlay_pressed():
+	$OptionsContainer.hide()
 	$HelpContainer.show() #if $HelpContainer/TextureRect/ExitHelp.emit_signal("pressed"):
 	AudioStreamSfxManager.play("res://sfx/cg_pop_1.wav", true, 0.0, 0.5, 1.5)
 

@@ -173,6 +173,7 @@ scroll_active = false
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 pause_mode = 2
 stream = ExtResource( 12 )
+volume_db = -8.0
 bus = "Music"
 
 [connection signal="reset" from="." to="Timer" method="_on_Main_reset"]
@@ -183,6 +184,7 @@ bus = "Music"
 [connection signal="change_player_sprite" from="MainMenu" to="PlayerCar" method="_on_MainMenu_change_player_sprite"]
 [connection signal="pressed" from="MainMenu/Play" to="." method="_on_Play_pressed"]
 [connection signal="pressed" from="MainMenu/Exit" to="." method="_on_Exit_pressed"]
+[connection signal="pressed" from="MainMenu/Restart" to="." method="_on_Restart_pressed"]
 [connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]
 [connection signal="score" from="Net/NetDetectArea2D" to="." method="_on_NetDetectArea2D_score"]
 

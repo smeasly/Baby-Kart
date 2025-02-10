@@ -24,7 +24,6 @@ func _ready():
 
 
 func _process(_delta):
-	
 	#set lastPlay to TRUE upon no longer recieving input, if input recieved before end, set restart and go back to loop start
 	if queuePlay && !playing: 
 		firstPlay = true

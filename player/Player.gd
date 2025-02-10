@@ -37,7 +37,6 @@ func _on_MainMenu_change_player_sprite(value):
 	set_stats_from_cartype(value)
 
 func set_stats_from_cartype(value : int):
-	
 	match value:
 		0: #GREEN_CAR, default balanced
 			maxAngularAccel = 5.5
@@ -50,9 +49,9 @@ func set_stats_from_cartype(value : int):
 			return
 		
 		1: #BLUE_CAR, better turning, worse speed
-			maxAngularAccel = 7
-			angularAccelCoef = 0.9
-			angularDecelCoef = 0.45
+			maxAngularAccel = 6.5
+			angularAccelCoef = 0.65
+			angularDecelCoef = 0.65
 			MAX_SPEED = 475
 			MAX_BACKSPEED = 200
 			ACCEL = 925
@@ -60,7 +59,7 @@ func set_stats_from_cartype(value : int):
 			return
 		
 		2: #RED_CAR, better speed, worse turning
-			maxAngularAccel = 5.5
+			maxAngularAccel = 5
 			angularAccelCoef = 0.5
 			angularDecelCoef = 0.3
 			MAX_SPEED = 650
@@ -71,7 +70,6 @@ func set_stats_from_cartype(value : int):
 
 
 func manual_input(delta):
-	
 	var inputUp = Input.is_action_pressed("ui_up")
 	var inputDown = Input.is_action_pressed("ui_down")
 	var inputLeft = Input.is_action_pressed("ui_left")
@@ -95,13 +93,10 @@ func manual_input(delta):
 	#Use clamp() on the result of range_lerp() if this is not desired.
 	#range_lerp(75, 0, 100, -1, 1) # Returns 0.5
 	
-	#leftAccelAdd = range_lerp(speed, 1, MAX_SPEED, 0.8, 0.2)	something like this?; as speed approaches max, 
-	#leftAccelAdd = clamp(leftAccelAdd, 0.2, 0.8)				turnAccelAdd approaches min.
+	#angularAccel = range_lerp(speed, 0, MAX_SPEED, maxAngularAccel, 4)
+	#angularAccel = clamp(angularAccel, maxAngularAccel)
 	#if inputLeft:
 	#	leftAccel += leftAccelAdd
-	
-	leftAccel = clamp(leftAccel, 0, maxAngularAccel)
-	rightAccel = clamp(rightAccel, 0, maxAngularAccel)
 	
 	if inputLeft: #&& (speed > 125 || backSpeed > 200):
 		leftAccel += angularAccelCoef
@@ -119,13 +114,8 @@ func manual_input(delta):
 		rightAccel -= angularDecelCoef
 		direction += rightAccel * delta
 	
-	#if inputLeft && (!inputDown || !inputUp):
-	#	leftAccel -= 0.35
-	#	direction -= leftAccel * delta
-	
-	#if inputRight && (!inputDown || !inputUp)
-	#	rightAccel -= 0.35
-	#	direction += rightAccel * delta
+	leftAccel = clamp(leftAccel, 0, maxAngularAccel)
+	rightAccel = clamp(rightAccel, 0, maxAngularAccel)
 	
 	#ACCELERATION AND DECELERATION
 	speed = clamp(speed, 0, MAX_SPEED)
@@ -198,7 +188,6 @@ func collision(delta):
 
 
 func _physics_process(delta):
-	
 	#INPUT
 	manual_input(delta)
 	rotation += direction
@@ -229,7 +218,6 @@ func _physics_process(delta):
 
 
 func play_particle():
-	
 	_particle.emitting = true
 	#_particle.color = color(0,1,1,1)
 	
@@ -237,11 +225,10 @@ func play_particle():
 
 
 func _on_Main_reset():
-	
 	velocity = Vector2.ZERO
 	leftAccel = 0
 	rightAccel = 0
 	speed = 0
 	direction = 0
-	position = Vector2(141, 283)
+	position = Vector2(145, 300)
 	rotation_degrees = 90

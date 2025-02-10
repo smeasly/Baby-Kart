@@ -2,7 +2,6 @@ extends Node
 
 
 func play(streamPath: String, randomize_pitch: bool = false, volume: float = 0.0, min_pitch: float = 1.0, max_pitch: float = 1.2) -> void:
-	
 	var audioStreamPlayer: AudioStreamPlayer = AudioStreamPlayer.new()
 	var bus = "SFX"
 	var pitch: float

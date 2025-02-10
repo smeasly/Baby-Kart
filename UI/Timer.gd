@@ -2,14 +2,11 @@ extends Timer
 
 
 func _ready():
-	
 	start(60)
-	
 	$TimerDisplay.text = "Time: %s" % time_left
 
 
 func _physics_process(_delta):
-	
 	$TimerDisplay.text = "Time: %s" % stepify(time_left, 00.1)
 	
 	if time_left <= 0.1:
@@ -17,11 +14,7 @@ func _physics_process(_delta):
 
 
 func _on_HourglassPickup_pickup():
-	
 	start(time_left + 5) #add 5 seconds to time limit
-	
-	if time_left > 60: #don't add above 60 seconds
-		start(60)
 
 
 func _on_Main_reset():

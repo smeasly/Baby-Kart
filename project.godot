@@ -20,11 +20,12 @@ _global_script_class_icons={
 
 [application]
 
-config/name="CarGame"
+config/name="Baby-Kart"
 config/description="A simple game about pushing a ball into a net under a time limit."
 run/main_scene="res://Main.tscn"
 boot_splash/image="res://assets/splash.png"
 config/icon="res://assets/icon.png"
+config/windows_native_icon="res://assets/icon.ico"
 
 [autoload]
 

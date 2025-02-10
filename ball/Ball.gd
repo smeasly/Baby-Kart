@@ -30,12 +30,13 @@ func _ready(): #Connect score signal to each new instance of Ball on instance
 
 
 func set_random_position():
+	#Center screen
 	position = Vector2(512, 300)
+	#Random
 #	screenSize = get_viewport_rect().size
 #	randomPos.x = rand_range(64, screenSize.x - 230)
-#	randomPos.y = rand_range(64, screenSize.y - 64)
+#	randomPos.y = rand_range(64, screenSize.y - 128)
 #	position = Vector2(randomPos.x, randomPos.y)
-	
 
 
 func _integrate_forces(state: Physics2DDirectBodyState):
@@ -44,6 +45,8 @@ func _integrate_forces(state: Physics2DDirectBodyState):
 		
 		state.linear_velocity = Vector2.ZERO
 		state.angular_velocity = 0
+		
+		set_random_position() #position or other physics properties can not be set directly in force integration
 		
 		_particle = spawnParticle.instance()
 		play_particle()
@@ -100,7 +103,6 @@ func play_particle():
 func _on_VisibilityNotifier2D_screen_exited(): # this is a work around/failsafe for the ball tunneling through the wall
 	
 	$Line2D.hide()
-	set_random_position()
 	queueReset = true
 
 
@@ -113,7 +115,7 @@ func _on_NetDetectArea2D_score():
 
 
 func _on_Main_reset():
-	
-	$Line2D.hide()
-	set_random_position()
-	queueReset = true
+	_particle.queue_free()
+	queue_free()
+	#$Line2D.hide()
+	#queueReset = true

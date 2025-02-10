@@ -43,4 +43,5 @@ func _on_HourglassPickup_body_entered(body):
 
 
 func _on_Main_reset():
+	_particle.queue_free()
 	queue_free()

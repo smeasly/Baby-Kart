@@ -3,6 +3,9 @@ extends RigidBody2D
 
 export var spawnParticle : PackedScene
 export var despawnParticle : PackedScene
+
+export var ballBounceSound : AudioStreamSample
+
 var _particle : Object
 
 var queueReset: bool = false
@@ -11,8 +14,6 @@ var randomPos: Vector2 = Vector2()
 var spriteStartRotation : float
 
 var called : bool = false
-
-var last
 
 
 func _ready(): #Connect score signal to each new instance of Ball on instance
@@ -29,7 +30,7 @@ func _ready(): #Connect score signal to each new instance of Ball on instance
 	play_particle()
 
 
-func set_random_position():
+func set_ball_position():
 	#Center screen
 	position = Vector2(512, 300)
 	#Random
@@ -46,7 +47,7 @@ func _integrate_forces(state: Physics2DDirectBodyState):
 		state.linear_velocity = Vector2.ZERO
 		state.angular_velocity = 0
 		
-		set_random_position() #position or other physics properties can not be set directly in force integration
+		set_ball_position() #position or other physics properties can not be set directly in force integration
 		
 		_particle = spawnParticle.instance()
 		play_particle()
@@ -71,6 +72,7 @@ func _process(_delta):
 	if get_colliding_bodies().empty(): #reset sfx called flag
 		called = false
 #	else:
+#		var last
 #		last = get_colliding_bodies()[0]
 #		if get_colliding_bodies().back() != last:
 #			called = false
@@ -80,13 +82,13 @@ func _process(_delta):
 		if body.is_class("KinematicBody2D"): 
 			
 			if called == false: 
-				AudioStreamSfxManager.play("res://sfx/cg_ball_bounce.wav", true, -10.0, 0.8, 1.2)
+				AudioStreamSfxManager.play(ballBounceSound, true, -10.0, 0.8, 1.2)
 				called = true
 		
 		if body.is_class("StaticBody2D"):
 			
 			if called == false: 
-				AudioStreamSfxManager.play("res://sfx/cg_ball_bounce.wav", true, -10.0, 0.8, 1.2)
+				AudioStreamSfxManager.play(ballBounceSound, true, -10.0, 0.8, 1.2)
 				called = true
 
 
@@ -116,6 +118,5 @@ func _on_NetDetectArea2D_score():
 
 func _on_Main_reset():
 	_particle.queue_free()
+	
 	queue_free()
-	#$Line2D.hide()
-	#queueReset = true

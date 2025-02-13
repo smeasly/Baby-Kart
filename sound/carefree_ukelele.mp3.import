@@ -1,0 +1,15 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+path="res://.import/carefree_ukelele.mp3-a05b4c31b78b93eccf51715256883411.mp3str"
+
+[deps]
+
+source_file="res://sound/carefree_ukelele.mp3"
+dest_files=[ "res://.import/carefree_ukelele.mp3-a05b4c31b78b93eccf51715256883411.mp3str" ]
+
+[params]
+
+loop=true
+loop_offset=0

@@ -26,6 +26,8 @@ var shape: CollisionShape2D #empty collsion shape
 export var crashParticle : PackedScene
 var _particle : Object
 
+export var wallBumpSound : AudioStreamSample
+
 
 func _ready():
 	rotation_degrees = 90
@@ -162,10 +164,10 @@ func collision(delta):
 					_particle = crashParticle.instance()
 					_particle.position = collision.position
 					play_particle()
-					AudioStreamSfxManager.play("res://sfx/wall_bump.wav", true, 1.3, 0.7, 1.2)
+					AudioStreamSfxManager.play(wallBumpSound, true, 1.3, 0.7, 1.2)
 					
 				else:
-					AudioStreamSfxManager.play("res://sfx/wall_bump.wav", true, 0.0, 1.0, 1.5)
+					AudioStreamSfxManager.play(wallBumpSound, true, 0.0, 1.0, 1.5)
 				
 				shape = collision.collider_shape   #log set first collision with a shape
 				called = true

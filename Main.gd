@@ -9,6 +9,13 @@ const SAVE_PATH = "user://babykart_save.ini"
 export var pickup : PackedScene
 export var ball : PackedScene
 
+export var popSound : AudioStreamSample
+export var dingSound : AudioStreamSample
+export var twinkleSound : AudioStreamSample
+export var cowbellSound : AudioStreamSample
+export var yeahSound : AudioStreamSample
+export var awwSound : AudioStreamSample
+
 signal reset
 
 var score : int = 0
@@ -46,7 +53,7 @@ func spawn_ball():
 	
 	call_deferred("add_child", _ball)
 	
-	AudioStreamSfxManager.play("res://sfx/cg_pop_1.wav", true, 0.0, 0.8, 1.5)
+	AudioStreamSfxManager.play(popSound, true, 0.0, 0.8, 1.5)
 
 func spawn_pickup() -> void:
 	SpawnCheck.pickupActive = true
@@ -56,7 +63,7 @@ func spawn_pickup() -> void:
 	_pickup.position = SpawnCheck.pickupPosition
 	call_deferred("add_child", _pickup)
 	
-	#AudioStreamSfxManager.play("res://sfx/cg_pop_1.wav", true, 0.0, 0.8, 1.5)
+	#AudioStreamSfxManager.play(popSound, true, 0.0, 0.8, 1.5)
 	
 	queuePickup = false
 	pickupSpawnIncr = 0
@@ -64,6 +71,7 @@ func spawn_pickup() -> void:
 
 #PAUSING/UNPAUSING THE GAME AND OPENING/CLOSING THE MENU
 func _on_OpenMenu_pressed():
+	AudioStreamSfxManager.play(popSound, true, 0.0, 0.5, 1.5)
 	get_tree().paused = true
 	
 	$OpenMenu.hide()
@@ -100,7 +108,7 @@ func _on_HourglassPickup_pickup():
 	
 	queuePickup = true
 	
-	AudioStreamSfxManager.play("res://sfx/crystal_twinkle.wav", true, -3)
+	AudioStreamSfxManager.play(twinkleSound, true, -3)
 	
 	pickupSpawnIncr = 0
 
@@ -108,7 +116,7 @@ func _on_NetDetectArea2D_score():
 	score += 5
 	$ScoreDisplay.text = "Score: %s" % score
 	
-	AudioStreamSfxManager.play("res://sfx/cg_glass_ding.wav", true, -5, 1, 1.6)
+	AudioStreamSfxManager.play(dingSound, true, -5, 1, 1.6)
 	
 	pickupSpawnIncr += 1
 	
@@ -160,12 +168,12 @@ func _on_Timer_timeout():
 	if check_highscore() == true:
 		$GameOver/LabelFinalScore.text = "You Set A New Hi-Score!: %s" % score
 		$MainMenu/HighScoreDisplay.text = "Hi-Score: %s" % highScore
-		AudioStreamSfxManager.play("res://sfx/cg_yeah.wav", false, -7)
+		AudioStreamSfxManager.play(yeahSound, false, -7)
 		save_score()
 		
 	else:
 		$GameOver/LabelFinalScore.text = "Your Final Score: %s" % score
-		AudioStreamSfxManager.play("res://sfx/cg_aww.wav", false, -7)
+		AudioStreamSfxManager.play(awwSound, false, -7)
 	
 	get_tree().paused = true
 	
@@ -184,19 +192,19 @@ func countdown(): #Countdown at the start of the round
 	
 	yield(get_tree().create_timer(0.5), "timeout")
 	$RichTextLabel.bbcode_text = "[center]3[/center]"
-	AudioStreamSfxManager.play("res://sfx/cg_cowbell.wav", false, -5)
+	AudioStreamSfxManager.play(cowbellSound, false, -5)
 	
 	yield(get_tree().create_timer(1.0), "timeout")
 	$RichTextLabel.bbcode_text = "[center]2[/center]"
-	AudioStreamSfxManager.play("res://sfx/cg_cowbell.wav", false, -5)
+	AudioStreamSfxManager.play(cowbellSound, false, -5)
 	
 	yield(get_tree().create_timer(1.0), "timeout")
 	$RichTextLabel.bbcode_text = "[center]1[/center]"
-	AudioStreamSfxManager.play("res://sfx/cg_cowbell.wav", false, -5)
+	AudioStreamSfxManager.play(cowbellSound, false, -5)
 	
 	yield(get_tree().create_timer(1.0), "timeout")
 	$RichTextLabel.bbcode_text = "[center]Go![/center]"
-	AudioStreamSfxManager.play("res://sfx/cg_yeah.wav", false, -5)
+	AudioStreamSfxManager.play(yeahSound, false, -5)
 	
 	get_tree().paused = false
 	
@@ -263,12 +271,13 @@ func _on_Play_pressed():
 func _on_Restart_pressed(): #Restart button on main menu
 	
 	if check_highscore() == true:
-		AudioStreamSfxManager.play("res://sfx/cg_yeah.wav", false, -7)
+		AudioStreamSfxManager.play(yeahSound, false, -7)
+		$MainMenu/HighScoreDisplay.text = "Hi-Score: %s" % highScore
 		save_score()
 		
 	else:
 		$GameOver/LabelFinalScore.text = "Your Final Score: %s" % score
-		AudioStreamSfxManager.play("res://sfx/cg_aww.wav", false, -7)
+		AudioStreamSfxManager.play(awwSound, false, -7)
 	
 	restart_game()
 

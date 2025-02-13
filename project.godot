@@ -29,8 +29,8 @@ config/windows_native_icon="res://assets/icon.ico"
 
 [autoload]
 
-AudioStreamSfxManager="*res://AudioStreamSFXManager.gd"
-SpawnCheck="*res://SpawnCheck.gd"
+AudioStreamSfxManager="*res://autoload/AudioStreamSFXManager.gd"
+SpawnCheck="*res://autoload/SpawnCheck.gd"
 
 [display]
 

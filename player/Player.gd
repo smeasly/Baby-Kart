@@ -17,7 +17,6 @@ var angularDecelCoef : float = 0.35
 const GREEN_CAR = preload("res://player/car.png")
 const BLUE_CAR = preload("res://player/car2.png")
 const RED_CAR = preload("res://player/car3.png")
-#const PURPLE_CAR = preload("res://player/car4.png") #Was supposed to impart more bounce to ball, but i can't seem to make a Kinematic body work like that.
 var carTypes : Array = [GREEN_CAR, BLUE_CAR, RED_CAR]
 
 var called: bool = false
@@ -81,20 +80,6 @@ func manual_input(delta):
 	direction = 0
 	
 	#STEERING
-	
-	#TODO use range_lerp() to make steering slower at high speeds
-	#var variable
-	#var 1valueMin:float; var 1valueMax:int
-	#var 2valueMin:int; var valueMax2:float
-	#var output
-	#output = range_lerp(variable, 1valueMin, 1valueMax, 2valueMin, 2valueMax)
-	
-	#● float range_lerp(value: float, istart: float, istop: float, ostart: float, ostop: float)
-	#Maps a value from range [istart, istop] to [ostart, ostop]. See also lerp() and inverse_lerp(). 
-	#If value is outside [istart, istop], then the resulting value will also be outside [ostart, ostop]. 
-	#Use clamp() on the result of range_lerp() if this is not desired.
-	#range_lerp(75, 0, 100, -1, 1) # Returns 0.5
-	
 	#angularAccel = range_lerp(speed, 0, MAX_SPEED, maxAngularAccel, 4)
 	#angularAccel = clamp(angularAccel, maxAngularAccel)
 	#if inputLeft:
@@ -156,7 +141,7 @@ func collision(delta):
 			speed -= (ACCEL * 2) * delta
 			backSpeed -= (ACCEL * 2) * delta
 		
-		if index > 0: #get_slide_collision(0) is called every frame, not exactly sure why, but doing n > 0 will at least lower compute cost
+		if index > 0:
 			
 			if called == false: 
 				
@@ -172,39 +157,25 @@ func collision(delta):
 				shape = collision.collider_shape   #log set first collision with a shape
 				called = true
 			
-			#need to log last TWO shapes, to avoid issues of overcalling in corners/intersection of 2 shapes
-			if collision.collider_shape != shape: #can comment this out for potentially more stable behaviour, but for now it works just fine
+			
+			if collision.collider_shape != shape:
 				called = false
-		
-		#this following part of the block is my attempt at fixing the 'stop on collide' issue, caused when property
-		#infinite_inertia = false. it didn't work and is therefore commented out, but i may be able to get it to work later
-		#this implementation required putting ' export(float, 0, 1) var pushFactor ' at the head of the script
-	#		clamp(pushFactor, 0, 1)
-	#		
-	#		if speed > 0:
-	#			pushFactor = speed / MAX_SPEED
-	#		elif backSpeed > 0:
-	#			pushFactor = backSpeed / MAX_BACKSPEED
-	#		
-	#		collision.collider.apply_central_impulse(-collision.normal * velocity.length() * pushFactor)
 
 
 func _physics_process(delta):
 	#INPUT
 	manual_input(delta)
 	rotation += direction
-	velocity = move_and_slide(velocity, Vector2(), false, 4, PI/4, true) #this last bool controls whether or not this object has infinite inertia.
+	velocity = move_and_slide(velocity, Vector2(), false, 4, PI/4, true)
 	
 	#PARTICLE TRAIL & CAR MOVEMENT SOUNDS
-	if speed > 125: #|| backSpeed > 200:
+	if speed > 125:
 		$ParticleTrail.emitting = true
-		#$AudioStreamPlayer.queuePlay = true
 		if $ParticleTrail.visible == false:
 			$ParticleTrail.show()
 		
 	elif speed <= 125 && $ParticleTrail.is_emitting() == true:
 		$ParticleTrail.emitting = false
-		#$AudioStreamPlayer.queuePlay = false
 	
 	if speed >= 125:
 		$AudioStreamPlayer.queuePlay = true
@@ -221,7 +192,6 @@ func _physics_process(delta):
 
 func play_particle():
 	_particle.emitting = true
-	#_particle.color = color(0,1,1,1)
 	
 	get_tree().current_scene.call_deferred("add_child", _particle)
 

@@ -88,7 +88,7 @@ func _on_ExitOptions_pressed():
 #HOW TO PLAY
 func _on_HowToPlay_pressed():
 	$OptionsContainer.hide()
-	$HelpContainer.show() #if $HelpContainer/TextureRect/ExitHelp.emit_signal("pressed"):
+	$HelpContainer.show()
 	AudioStreamSfxManager.play(popSound, true, 0.0, 0.5, 1.5)
 
 func _on_ExitHelp_pressed():

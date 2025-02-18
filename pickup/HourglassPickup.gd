@@ -28,7 +28,6 @@ func play_particle():
 	_particle.position = global_position
 	_particle.rotation = global_rotation
 	_particle.emitting = true
-	#_particle.color = color(1,0,1,1)
 	get_tree().current_scene.call_deferred("add_child", _particle)
 
 
@@ -43,5 +42,6 @@ func _on_HourglassPickup_body_entered(body):
 
 
 func _on_Main_reset():
-	_particle.queue_free()
+	if is_instance_valid(_particle):
+		_particle.queue_free()
 	queue_free()

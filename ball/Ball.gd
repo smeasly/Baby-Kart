@@ -33,7 +33,7 @@ func _ready(): #Connect score signal to each new instance of Ball on instance
 func set_ball_position():
 	#Center screen
 	position = Vector2(512, 300)
-	#Random
+	#Random position
 #	screenSize = get_viewport_rect().size
 #	randomPos.x = rand_range(64, screenSize.x - 230)
 #	randomPos.y = rand_range(64, screenSize.y - 128)
@@ -61,21 +61,9 @@ func _process(_delta):
 	
 	$Sprite.set_global_rotation_degrees(spriteStartRotation) #keep sprite rotation
 	
-#	if flag == false: 
-#		var vx = abs(linear_velocity.x)
-#		var vy = abs(linear_velocity.y)
-#		if vx + vy > 420: #check: print(vx, ":", vy)
-#			yield(get_tree().create_timer(0.25), "timeout")
-#			flag = false
-	
 	#BOUNCE SFX
 	if get_colliding_bodies().empty(): #reset sfx called flag
 		called = false
-#	else:
-#		var last
-#		last = get_colliding_bodies()[0]
-#		if get_colliding_bodies().back() != last:
-#			called = false
 	
 	for body in get_colliding_bodies(): #for each collision event, called every frame of detected collision...
 		
@@ -97,7 +85,6 @@ func play_particle():
 	_particle.position = global_position
 	_particle.rotation = global_rotation
 	_particle.emitting = true
-	#_particle.color = color(0,1,1,1)
 	
 	get_tree().current_scene.call_deferred("add_child", _particle)
 
@@ -117,6 +104,7 @@ func _on_NetDetectArea2D_score():
 
 
 func _on_Main_reset():
-	_particle.queue_free()
 	
+	if is_instance_valid(_particle):
+		_particle.queue_free()
 	queue_free()

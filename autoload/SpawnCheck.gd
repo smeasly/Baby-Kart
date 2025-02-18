@@ -1,6 +1,5 @@
 #split screen into quadrants, get car pos, find which quad it's in...
 #pick a random quad that is free to spawn ball/pickup at a random location within said quad.
-
 extends Area2D
 
 

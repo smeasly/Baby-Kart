@@ -1,5 +1,4 @@
-#keep score, write highscore to file, and handle spawning, pausing and opening menus/displays
-
+##keep score, write highscore to file, and handle spawning, pausing and opening menus/displays
 extends Node
 
 class_name Main
@@ -63,8 +62,6 @@ func spawn_pickup() -> void:
 	_pickup.position = SpawnCheck.pickupPosition
 	call_deferred("add_child", _pickup)
 	
-	#AudioStreamSfxManager.play(popSound, true, 0.0, 0.8, 1.5)
-	
 	queuePickup = false
 	pickupSpawnIncr = 0
 
@@ -77,7 +74,7 @@ func _on_OpenMenu_pressed():
 	$OpenMenu.hide()
 	$MainMenu.show()
 
-func _input(event): #Pause w/ esc key
+func _input(event): #Pause w/ esc key, unpausing with escape key doesn't work because of issues with process modes
 	if event is InputEventKey:
 		
 		if event.pressed && event.scancode == KEY_ESCAPE && !get_tree().paused:
@@ -87,16 +84,6 @@ func _input(event): #Pause w/ esc key
 			$OpenMenu.hide()
 			$MainMenu.show()
 			
-#unpausing with escape key
-#doesn't work with pause mode, if main's pause process wasn't set to inherit, the following would cause unintended behaviour anyway.
-#		elif event.pressed && event.scancode == KEY_ESCAPE && get_tree().paused && $MainMenu.visible: 
-#			
-#			get_tree().paused = false
-#			
-#			$MainMenu.hide()
-#			
-#		else:
-#			pass
 
 
 #SCORING
@@ -133,9 +120,9 @@ func save_score():
 	config.set_value("Highscores", "highscore", highScore)
 	config.save(SAVE_PATH)
 	
-#	var error := config.save(SAVE_PATH)
+#	var error := config.save(SAVE_PATH) #do not expect errors with saves
 #	if error != OK:
-#		print("An error occured while saving: ", error)
+#		printerr("An error occured while saving: ", error)
 
 func load_score():
 	var config := ConfigFile.new()
@@ -182,7 +169,7 @@ func _on_Timer_timeout():
 
 #START,RESTART, AND CLOSE GAME
 func countdown(): #Countdown at the start of the round
-	$RichTextLabel.show() #I want to add some text effects to this label, but syncing it with the timer and displaying correctly is a pain
+	$RichTextLabel.show() #I wanted to add some text effects to this label, but syncing it with the timer and displaying correctly is a pain
 	
 	$OpenMenu.hide()
 	

@@ -36,7 +36,7 @@ func _process(_delta):
 		if firstPlay && playhead >= loopStartSeconds: #first play off, only relevant when using following conditional
 			firstPlay = false
 		
-#		if !firstPlay && playhead < loopStartSeconds: #causes some unintended behaviour here, but may be useful for other applications
+#		if !firstPlay && playhead < loopStartSeconds: #causes some unintended behaviour here, but may be useful for other applications in the future
 #			seek(loopStartSeconds)
 		
 		if queuePlay && playhead > loopEndSeconds: #if still looping, make sure loop goes back to start after leaving loop
